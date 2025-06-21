@@ -1,0 +1,33 @@
+{
+	"lastUpdated": "2025-06-21T22:24:22.198742437+02:00",
+	"fields": {
+		"DB_FILE": {
+			"required": true,
+			"public": true,
+			"key": "DB_FILE",
+			"value": "file:dev.db"
+		},
+		"MODE": {
+			"key": "MODE",
+			"enum": [
+				"dev",
+				"prod"
+			],
+			"default": "dev"
+		},
+		"PORT": {
+			"required": true,
+			"format": ":{number}",
+			"key": "PORT",
+			"default": ":8080"
+		},
+		"TURSO_AUTH_TOKEN": {
+			"required": true,
+			"key": "TURSO_AUTH_TOKEN"
+		},
+		"TURSO_DATABASE_URL": {
+			"required": true,
+			"key": "TURSO_DATABASE_URL"
+		}
+	}
+}
