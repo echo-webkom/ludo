@@ -24,6 +24,7 @@ go run cmd/main.go
   - `/cmd`: Entry point
   - `/config`: API configuration
   - `/server`: Endpoint
-  - `/service`: Service connecting db and github
+  - `/ludo`: Service for Ludo actions
   - `/database`: Database repo for queries and models
-  - `/github`: GitHub API repo
+  - `/github`: Service for interacting with the GitHub API
+  - `/git`: Service for local git actions
