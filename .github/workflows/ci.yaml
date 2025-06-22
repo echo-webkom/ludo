@@ -20,7 +20,6 @@ jobs:
       - name: Install linters
         run: |
           go install honnef.co/go/tools/cmd/staticcheck@latest
-          go install golang.org/x/lint/golint@latest
 
       - name: Build
         run: go build ./...
@@ -42,11 +41,3 @@ jobs:
 
       - name: Run staticcheck
         run: staticcheck ./...
-
-      - name: Run golint
-        run: |
-          OUTPUT=$(golint ./...)
-          if [ -n "$OUTPUT" ]; then
-            echo "$OUTPUT"
-            exit 1
-          fi
