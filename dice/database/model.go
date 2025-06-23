@@ -1,6 +1,8 @@
 package database
 
-import "time"
+import (
+	"gorm.io/gorm"
+)
 
 type List int
 
@@ -13,25 +15,26 @@ const (
 )
 
 type Item struct {
-	ID              uint
+	gorm.Model
+	RepoID			uint
 	Repo            Repo
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
 	Title           string
 	Description     string
+	CreatorID		uint
 	Creator         User
+	AssigneeID 		uint
 	Assignee        User
 	ConnectedBranch string
 	List            List
 }
 
 type User struct {
-	ID   uint
+	gorm.Model
 	Name string
 }
 
 type Repo struct {
-	ID   uint
+	gorm.Model
 	Name string
 	URL  string
 }
