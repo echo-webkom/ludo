@@ -29,10 +29,10 @@ func New(config *config.Config) *Database {
 
 	db, err := gorm.Open(loadRemoteDB(config), &gorm.Config{})
 	if err != nil {
-		log.Fatal("could not load remoter database", err)
+		log.Fatal("could not load remote database", err)
 	}
 
-	if err := db.AutoMigrate(&Item{}); err != nil {
+	if err := db.AutoMigrate(&Item{}, &User{}, &Repo{}); err != nil {
 		log.Fatalf("migration: %v", err)
 	}
 	return &Database{db}
