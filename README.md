@@ -1,4 +1,12 @@
-# ludo
+<div align="center">
+
+<h1>Ludo</h1>
+
+<img src=".github/mock.png" width="80%">
+
+</div>
+
+<br>
 
 ## Run
 
