@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Ludo - Dashboard</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<style>
+		* {
+			font-family: "Inter", Roboto;
+		}
+	</style>
+	<body>
+		<div class="w-full flex p-0 gap-0 flex-col h-[100vh] bg-slate-100">
+			<!-- Navbar -->
+			<div class="bg-slate-100 w-full flex justify-between items-center px-8 py-5 border-b-slate-200 border">
+				<!-- Board title -->
+				<div><p class="font-bold text-slate-700 text-xl">ECHO WEB MONO</p></div>
+				<!-- Login details -->
+				<div><p class="text-slate-700 text-sm">Hello, jesperkha!</p></div>
+			</div>
+
+			<div class="w-full h-full flex gap-2">
+				<!-- Sidebar -->
+				<div class="h-full px-6 py-5 bg-slate-100 w-[15%] text-slate-600 flex flex-col border-slate-200">
+					<p class="font-bold font-lg text-slate-700 px-2 mb-2">BOARD</p>
+
+					<div class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 p-2 rounded">
+						<img src="assets/eye.svg" alt="" class="w-4" />
+						<p class="text-sm">View finished items</p>
+					</div>
+
+					<div class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 p-2 rounded">
+						<img src="assets/link.svg" alt="" class="w-4" />
+						<p class="text-sm">Open repository</p>
+					</div>
+
+					<p class="font-bold font-lg text-slate-700 px-2 mt-8 mb-2">PROJECT</p>
+
+					<div class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 p-2 rounded">
+						<img src="assets/user-add.svg" alt="" class="w-4" />
+						<p class="text-sm">Add user</p>
+					</div>
+				</div>
+
+				<!-- Board -->
+				<div class="bg-slate-200 flex-grow grid grid-cols-4 grid-rows-1 gap-2 p-2 border-slate-300">
+					<div class="">
+						<div class="w-full">
+							<div class="flex justify-between items-center px-4 py-3">
+								<p class="font-bold text-slate-700">BACKLOG <span class="text-slate-400 ml-2">1</span></p>
+								<div class="flex gap-1 opacity-50">
+									<img src="assets/add.svg" alt="" class="w-4" />
+									<p class="text-sm">ADD</p>
+								</div>
+							</div>
+							<!-- Backlog items -->
+							<div class="text-slate-700 flex flex-col gap-1">
+								<!-- item begin -->
+								<div class="px-4 py-3 bg-slate-100 shadow border border-slate-200">
+									<p>Some backlog item</p>
+								</div>
+								<!-- item end -->
+								<!-- item begin -->
+								<div class="px-4 py-3 bg-slate-100 shadow border border-slate-200">
+									<p>Some backlog item</p>
+								</div>
+								<!-- item end -->
+								<!-- item begin -->
+								<div class="px-4 py-3 bg-slate-100 shadow border border-slate-200">
+									<p>Some backlog item</p>
+								</div>
+								<!-- item end -->
+							</div>
+						</div>
+					</div>
+					<div class="">
+						<div class="w-full">
+							<div class="flex justify-between items-center px-4 py-3">
+								<p class="font-bold text-slate-700">TODO <span class="text-slate-400 ml-2">1</span></p>
+								<div class="flex gap-1 opacity-50">
+									<img src="assets/add.svg" alt="" class="w-4" />
+									<p class="text-sm">ADD</p>
+								</div>
+							</div>
+							<!-- Backlog items -->
+							<div class="text-slate-700 flex flex-col gap-1">
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow border border-slate-200">
+									<p class="font-bold">Some todo item</p>
+									<div class="flex items-center gap-2 p-2 rounded">
+										<img src="assets/pen.svg" alt="" class="w-4" />
+										<p class="text-sm text-slate-500">jesperkha (22.04.25)</p>
+									</div>
+								</div>
+								<!-- item end -->
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow border border-slate-200">
+									<p class="font-bold">Some todo item</p>
+									<div class="flex items-center gap-2 p-2 rounded">
+										<img src="assets/pen.svg" alt="" class="w-4" />
+										<p class="text-sm text-slate-500">jesperkha (22.04.25)</p>
+									</div>
+								</div>
+								<!-- item end -->
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow border border-slate-200">
+									<p class="font-bold">Some todo item</p>
+									<div class="flex items-center gap-2 p-2 rounded">
+										<img src="assets/pen.svg" alt="" class="w-4" />
+										<p class="text-sm text-slate-500">jesperkha (22.04.25)</p>
+									</div>
+								</div>
+								<!-- item end -->
+							</div>
+						</div>
+					</div>
+					<div class="">
+						<div class="w-full">
+							<p class="font-bold text-slate-700 px-4 py-3">IN PROGRESS <span class="text-slate-400 ml-2">1</span></p>
+							<!-- Doing items -->
+							<div class="text-slate-700 flex flex-col gap-1">
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow flex flex-col gap-2 border border-slate-200">
+									<p class="font-bold">Some in progress item</p>
+									<p class="text-sm text-slate-500">jesper/some-in-progress-item</p>
+									<div class="flex items-center gap-4">
+										<div class="flex items-center gap-2 rounded text-red-400">
+											<img src="assets/user.svg" alt="" class="w-4" />
+											<p class="text-sm">jesperkha</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-green-400">
+											<img src="assets/alarm.svg" alt="" class="w-4 text-green-400" />
+											<p class="text-sm">19.05.25</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-blue-400">
+											<img src="assets/git-fork.svg" alt="" class="w-4" />
+											<p class="text-sm">13</p>
+										</div>
+									</div>
+								</div>
+								<!-- item end -->
+
+								<!-- item end -->
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow flex flex-col gap-2 border border-slate-200">
+									<p class="font-bold">Some in progress item</p>
+									<p class="text-sm text-slate-500">jesper/some-in-progress-item</p>
+									<div class="flex items-center gap-4">
+										<div class="flex items-center gap-2 rounded text-red-400">
+											<img src="assets/user.svg" alt="" class="w-4" />
+											<p class="text-sm">jesperkha</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-green-400">
+											<img src="assets/alarm.svg" alt="" class="w-4 text-green-400" />
+											<p class="text-sm">19.05.25</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-blue-400">
+											<img src="assets/git-fork.svg" alt="" class="w-4" />
+											<p class="text-sm">13</p>
+										</div>
+									</div>
+								</div>
+								<!-- item end -->
+							</div>
+						</div>
+					</div>
+
+					<!-- In review items -->
+					<div class="">
+						<div class="w-full">
+							<p class="font-bold text-slate-700 px-4 py-3">IN REVIEW <span class="text-slate-400 ml-2">1</span></p>
+							<div class="text-slate-700 flex flex-col gap-1">
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow flex flex-col gap-2 border border-slate-200">
+									<p class="font-bold">Some in review item</p>
+									<p class="text-sm text-slate-500">jesper/some-in-review-item</p>
+									<div class="flex items-center gap-4">
+										<div class="flex items-center gap-2 rounded text-red-400">
+											<img src="assets/user.svg" alt="" class="w-4" />
+											<p class="text-sm">jesperkha</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-blue-400">
+											<img src="assets/browse.svg" alt="" class="w-4" />
+											<p class="text-sm">0Zeno</p>
+										</div>
+									</div>
+								</div>
+								<!-- item end -->
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow flex flex-col gap-2 border border-slate-200">
+									<p class="font-bold">Some in review item</p>
+									<p class="text-sm text-slate-500">jesper/some-in-review-item</p>
+									<div class="flex items-center gap-4">
+										<div class="flex items-center gap-2 rounded text-red-400">
+											<img src="assets/user.svg" alt="" class="w-4" />
+											<p class="text-sm">jesperkha</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-blue-400">
+											<img src="assets/browse.svg" alt="" class="w-4" />
+											<p class="text-sm">0Zeno</p>
+										</div>
+									</div>
+								</div>
+								<!-- item begin -->
+								<div class="px-4 py-4 bg-slate-100 shadow flex flex-col gap-2 border border-slate-200">
+									<p class="font-bold">Some in review item</p>
+									<p class="text-sm text-slate-500">jesper/some-in-review-item</p>
+									<div class="flex items-center gap-4">
+										<div class="flex items-center gap-2 rounded text-red-400">
+											<img src="assets/user.svg" alt="" class="w-4" />
+											<p class="text-sm">jesperkha</p>
+										</div>
+										<div class="flex items-center gap-2 rounded text-blue-400">
+											<img src="assets/browse.svg" alt="" class="w-4" />
+											<p class="text-sm">0Zeno</p>
+										</div>
+									</div>
+								</div>
+								<!-- item end -->
+								<!-- item end -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
