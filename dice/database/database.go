@@ -1,52 +1,22 @@
 package database
 
-import (
-	"log"
+type Database interface {
+	GetUserById(id uint) (User, error)
+	DeleteUserById(id uint) error
+	GetAllUsers() ([]User, error)
 
-	"github.com/echo-webkom/ludo/dice/config"
-	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-)
+	GetItemById(id uint) (Item, error)
+	CreateItem(item Item) error
+	GetAllItems() ([]Item, error)
+	DeleteItemByID(id uint) error
+	GetAllItemsFromLits(list List) ([]Item, error)
+	MoveItemToList(id uint, list List) error
+	ChangeItemTitle(id uint, title string) error
+	ChangeItemDescription(id uint, description string) error
 
-type TursoDB struct {
-	db *gorm.DB
-}
+	CreateNewRepo(name, url string) error
+	DeleteRepoById(id uint) error
 
-func NewTursoDB(config *config.Config) *TursoDB {
-	if config.IsDev {
-		db, err := gorm.Open(sqlite.Open(config.DBFile), &gorm.Config{})
-		if err != nil {
-			log.Fatal("could not load local database", err)
-		}
-		if err := db.AutoMigrate(&Item{}); err != nil {
-			log.Fatalf("migration: %v", err)
-		}
-
-		return &TursoDB{db}
-	}
-
-	db, err := gorm.Open(loadRemoteDB(config), &gorm.Config{})
-	if err != nil {
-		log.Fatal("could not load remote database", err)
-	}
-
-	if err := db.AutoMigrate(&Item{}, &User{}, &Repo{}); err != nil {
-		log.Fatalf("migration: %v", err)
-	}
-	return &TursoDB{db}
-}
-
-func (db *TursoDB) Close() error {
-	raw, err := db.db.DB()
-	if err != nil {
-		return err
-	}
-	return raw.Close()
-}
-
-func loadRemoteDB(config *config.Config) gorm.Dialector {
-	url := config.DatabaseURL + config.DatabaseToken
-	return sqlite.Open(url)
+	// Username must be identical to GitHub username.
+	CreateUser(username string) error
 }
