@@ -8,7 +8,7 @@ Get a list of all items.
 
 Response type:
 
-```json
+```
 [
     {
         "id": int
@@ -36,7 +36,7 @@ Create new item (todo or backlog).
 
 Expects the following format as the request body, all fields are required:
 
-```json
+```
 {
     "title": string
     "description": string // Ignored for backlog items
@@ -56,7 +56,7 @@ Get a list of all users.
 
 Response type:
 
-```json
+```
 [
 	{
         "id": int
