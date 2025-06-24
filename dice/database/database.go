@@ -10,11 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type Database struct {
+type TursoDB struct {
 	db *gorm.DB
 }
 
-func New(config *config.Config) *Database {
+func NewTursoDB(config *config.Config) *TursoDB {
 	if config.IsDev {
 		db, err := gorm.Open(sqlite.Open(config.DBFile), &gorm.Config{})
 		if err != nil {
@@ -24,7 +24,7 @@ func New(config *config.Config) *Database {
 			log.Fatalf("migration: %v", err)
 		}
 
-		return &Database{db}
+		return &TursoDB{db}
 	}
 
 	db, err := gorm.Open(loadRemoteDB(config), &gorm.Config{})
@@ -35,10 +35,10 @@ func New(config *config.Config) *Database {
 	if err := db.AutoMigrate(&Item{}, &User{}, &Repo{}); err != nil {
 		log.Fatalf("migration: %v", err)
 	}
-	return &Database{db}
+	return &TursoDB{db}
 }
 
-func (db *Database) Close() error {
+func (db *TursoDB) Close() error {
 	raw, err := db.db.DB()
 	if err != nil {
 		return err

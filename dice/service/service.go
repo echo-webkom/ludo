@@ -7,12 +7,12 @@ import (
 
 type Service struct {
 	config *config.Config
-	db     *database.Database
+	db     *database.TursoDB
 }
 
 func New(config *config.Config) *Service {
 	return &Service{
 		config,
-		database.New(config),
+		database.NewTursoDB(config),
 	}
 }
