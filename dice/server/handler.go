@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-
 )
 
 func pingHandler() http.HandlerFunc {
@@ -13,7 +12,7 @@ func pingHandler() http.HandlerFunc {
 
 func createHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+
 	}
 }
 

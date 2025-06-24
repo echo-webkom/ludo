@@ -16,13 +16,13 @@ const (
 
 type Item struct {
 	gorm.Model
-	RepoID			uint
+	RepoID          uint
 	Repo            Repo
 	Title           string
 	Description     string
-	CreatorID		uint
+	CreatorID       uint
 	Creator         User
-	AssigneeID 		uint
+	AssigneeID      uint
 	Assignee        User
 	ConnectedBranch string
 	List            List
