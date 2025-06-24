@@ -23,10 +23,6 @@ func New(config *config.Config, service *service.Service) *Server {
 
 	r.Get("/ping", pingHandler())
 
-	r.Delete("/{id}", deleteHandler())
-	r.Post("/create/{where}", createHandler())
-	r.Patch("/move/{where}/{id}", moveHandler())
-
 	return &Server{
 		router: r,
 		port:   config.Port,
