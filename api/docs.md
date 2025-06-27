@@ -2,73 +2,74 @@
 
 ## Endpoints
 
-### `GET /items` - All items
+### Users
 
-Get a list of all items.
+| Method | Path              | Response Type | Description             |
+| ------ | ----------------- | ------------- | ----------------------- |
+| GET    | `/users`          | `User[]`      | Get all users           |
+| POST   | `/users`          | -             | Create new user         |
+| GET    | `/users/{userId}` | `User`        | Get user by ID          |
+| PATCH  | `/users/{userId}` | -             | Update an existing user |
+| DELETE | `/users/{userId}` | -             | Delete a user           |
 
-Response type:
+### Boards
 
-```
-[
-    {
-        "id": int
-        "title": string
-        "description": string
-        "connectedBranch": string
-        "list": "backlog" | "todo" | "in progress" | "in review"
-        "creator": {
-            "name": string
-        }
-        "assignee": {
-            "name": string
-        }
-        "repo": {
-            "name": string
-            "url": string
-        }
-    }
-]
-```
+| Method | Path                                     | Response Type | Description                 |
+| ------ | ---------------------------------------- | ------------- | --------------------------- |
+| GET    | `/boards`                                | `Board[]`     | Get all boards              |
+| POST   | `/boards`                                | -             | Create new board            |
+| GET    | `/boards/{boardId}`                      | `Board`       | Get board by ID             |
+| PATCH  | `/boards/{boardId}`                      | -             | Update an existing board    |
+| DELETE | `/boards/{boardId}`                      | -             | Delete a board              |
+| GET    | `/boards/{boardId}/users`                | `[]User`      | Get all users in board      |
+| GET    | `/boards/{boardId}/items`                | `[]Item`      | Get all items in board      |
+| GET    | `/boards/{boardId}/lists/{listId}/items` | `[]Item`      | Get all items in board list |
 
-### `POST /item` - Create item
+### Items
 
-Create new item (todo or backlog).
+| Method | Path                            | Response Type | Description                  |
+| ------ | ------------------------------- | ------------- | ---------------------------- |
+| GET    | `/items`                        | `[]Item`      | Get all items                |
+| POST   | `/items`                        | -             | Create an item               |
+| GET    | `/items/{itemId}`               | `Item`        | Get item by ID               |
+| PATCH  | `/items/{itemId}`               | -             | Update an existing item      |
+| DELETE | `/items/{itemId}`               | -             | Delete an item               |
+| PATCH  | `/items/{itemId}/move/{listId}` | -             | Move an item to another list |
 
-Expects the following format as the request body, all fields are required:
+## Schemas
 
-```
-{
-    "title": string
-    "description": string // Ignored for backlog items
-    "list": "backlog" | "todo"
-}
-```
+All field names are identical to the ones found in the JSON response data.
 
-Responds with `200` on success.
+### User
 
-### `PATCH /item/{id}` - Update item
+| Field          | Type   | Description                                |
+| -------------- | ------ | ------------------------------------------ |
+| id             | uint   | Unique ID                                  |
+| displayName    | string | Name to display in boards                  |
+| githubUsername | string | Username on GitHub, used to track branches |
+| createdAt      | uint   | Unix time of creation                      |
+| updatedAt      | uint   | Unix time of last update                   |
 
-Todo
+### Board
 
-### `GET /users` - All users
+| Field     | Type   | Description               |
+| --------- | ------ | ------------------------- |
+| id        | uint   | Unique ID                 |
+| repoName  | string | Name of remote repository |
+| repoUrl   | string | URL to remote repository  |
+| createdAt | uint   | Unix time of creation     |
+| updatedAt | uint   | Unix time of last update  |
 
-Get a list of all users.
+### Item
 
-Response type:
-
-```
-[
-	{
-        "id": int
-		"username": string
-	}
-]
-```
-
-Responds with `200` on success.
-
-### `DELETE /user/{id}` - Delete user
-
-Delete a user by its ID.
-
-Responds with `200` on success.
+| Field       | Type   | Description                          |
+| ----------- | ------ | ------------------------------------ |
+| id          | uint   | Unique ID                            |
+| list        | uint   | ID of list this item is in           |
+| title       | string | Items title                          |
+| description | string | Items description                    |
+| creator     | uint   | ID of user that created this item    |
+| assignee    | uint   | ID of user this item is assigned to  |
+| branch      | string | Name of branch this item is tracking |
+| createdAt   | uint   | Unix time of creation                |
+| updatedAt   | uint   | Unix time of last update             |
