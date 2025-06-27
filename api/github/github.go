@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/echo-webkom/ludo/dice/config"
+	"github.com/echo-webkom/ludo/api/config"
 	"github.com/google/go-github/v72/github"
 )
 

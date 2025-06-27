@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/echo-webkom/ludo/dice/config"
-	"github.com/echo-webkom/ludo/dice/service"
+	"github.com/echo-webkom/ludo/api/config"
+	"github.com/echo-webkom/ludo/api/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jesperkha/notifier"

@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 
-	"github.com/echo-webkom/ludo/dice/config"
+	"github.com/echo-webkom/ludo/api/config"
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	"gorm.io/driver/sqlite"

@@ -4,9 +4,9 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/echo-webkom/ludo/dice/config"
-	"github.com/echo-webkom/ludo/dice/server"
-	"github.com/echo-webkom/ludo/dice/service"
+	"github.com/echo-webkom/ludo/api/config"
+	"github.com/echo-webkom/ludo/api/server"
+	"github.com/echo-webkom/ludo/api/service"
 	"github.com/jesperkha/notifier"
 )
 

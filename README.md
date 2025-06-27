@@ -18,9 +18,9 @@ go run cmd/main.go
 ```
 
 ```sh
-# Run dice
+# Run api
 
-cd dice
+cd api
 cenv fix
 go run cmd/main.go
 ```
@@ -28,7 +28,7 @@ go run cmd/main.go
 ## Structure
 
 - `/board`: Local web view
-- `/dice`: Ludo API
+- `/api`: Ludo API
   - `/cmd`: Entry point
   - `/config`: API configuration
   - `/server`: Endpoint

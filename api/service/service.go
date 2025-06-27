@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/echo-webkom/ludo/dice/config"
-	"github.com/echo-webkom/ludo/dice/database"
+	"github.com/echo-webkom/ludo/api/config"
+	"github.com/echo-webkom/ludo/api/database"
 )
 
 type Service struct {

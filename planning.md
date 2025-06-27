@@ -63,7 +63,7 @@ slack -^
 
 /ludo
 /board - web app
-/dice - API
+/api - API
 /server - api endpoint og server
 /board - service for todo list (over db)
 /database - database service
