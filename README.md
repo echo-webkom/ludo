@@ -25,14 +25,14 @@ cenv fix
 go run cmd/main.go
 ```
 
-## Structure
+## Architecture
 
-- `/board`: Local web view
-- `/api`: Ludo API
-  - `/cmd`: Entry point
-  - `/config`: API configuration
-  - `/server`: Endpoint
-  - `/ludo`: Service for Ludo actions
-  - `/database`: Database repo for queries and models
-  - `/github`: Service for interacting with the GitHub API
-  - `/git`: Service for local git actions
+Ludo has a central API which handles interacting with the database and GitHub. The API is meant to be a generic tool to create different kinds of project management applications, or _boards_. Ludo only assigns basic relations between models such as items and boards, and allowes the board client to determine how everything should work.
+
+The API is also designed to be easily self-hosteable using a SQLite backend.
+
+<div align="center">
+
+<img src=".github/diagram.png" width="80%">
+
+</div>
