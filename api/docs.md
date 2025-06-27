@@ -1,8 +1,12 @@
 # Ludo API documentation
 
+Ludo is comprised of users, boards, and items. Each board has a list of users, and a list of items. Each item has a list ID which specifies which list it belongs to. However, there is no list type. This is to genericize lists and make them act more like a _group_. Ludo is meant to be used for all kinds of boards and viewing options, and it should be left up to each boards implementation to organize and display items.
+
 ## Endpoints
 
 ### Users
+
+Users are not accounts. You are not _logged in_ as your user. Users are simply used to mark ownership of items. Each user is linked to a GitHub account.
 
 | Method | Path              | Response Type | Description             |
 | ------ | ----------------- | ------------- | ----------------------- |
@@ -14,6 +18,8 @@
 
 ### Boards
 
+Boards are containers for items and have users assosiated with them. A board may be connected to a GitHub repo.
+
 | Method | Path                                     | Response Type | Description                 |
 | ------ | ---------------------------------------- | ------------- | --------------------------- |
 | GET    | `/boards`                                | `Board[]`     | Get all boards              |
@@ -23,6 +29,8 @@
 | DELETE | `/boards/{boardId}`                      | -             | Delete a board              |
 | GET    | `/boards/{boardId}/users`                | `[]User`      | Get all users in board      |
 | GET    | `/boards/{boardId}/items`                | `[]Item`      | Get all items in board      |
+| POST   | `/boards/{boardId}/users/{userId}`       | -             | Add user to board           |
+| DELETE | `/boards/{boardId}/users/{userId}`       | -             | Remove user from board      |
 | GET    | `/boards/{boardId}/lists/{listId}/items` | `[]Item`      | Get all items in board list |
 
 ### Items
