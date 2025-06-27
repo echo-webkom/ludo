@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"github.com/echo-webkom/ludo/board/config"
+	"github.com/echo-webkom/ludo/board/server"
 )
 
 func main() {
-	log.Println("Listening at port :8080")
-	http.ListenAndServe(":8080", http.FileServer(http.Dir("web")))
+	config := config.Load()
+	_ = server.New(config)
 }

@@ -36,3 +36,19 @@ The API is also designed to be easily self-hosteable using a SQLite backend.
 <img src=".github/diagram.png" width="80%">
 
 </div>
+
+### Project structure
+
+- `/board`:
+  - `/cmd`: Entry point
+  - `/config`: Board client configuration
+  - `/server`: Mounting of endpoints/boards
+  - `/service`: Service for interacting with Ludo API
+  - `/git`: Service for local git actions
+- `/api`:
+  - `/cmd`: Entry point
+  - `/config`: API configuration
+  - `/server`: Mounting of endpoints
+  - `/service`: Service for Ludo actions
+  - `/database`: Database repo for queries and models
+  - `/github`: Service for interacting with the GitHub API

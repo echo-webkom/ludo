@@ -1,0 +1,18 @@
+{
+	"lastUpdated": "2025-06-27T23:14:23.9493491+02:00",
+	"fields": {
+		"API_AUTH_TOKEN": {
+			"required": true,
+			"key": "API_AUTH_TOKEN"
+		},
+		"API_URl": {
+			"required": true,
+			"key": "API_URl"
+		},
+		"PORT": {
+			"required": true,
+			"key": "PORT",
+			"default": ":8081"
+		}
+	}
+}
