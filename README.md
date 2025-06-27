@@ -1,12 +1,26 @@
 <div align="center">
 
-<h1>Ludo</h1>
+<img src=".github/logo.png" width="25%">
+
+<b>Simplified project management</b>
+
+Ludo aims to put all of your project planning needs in one place and lets <br>you add your own views and boards with minimal friction using its API.
+
+<br>
 
 <img src=".github/mock.png" width="80%">
 
+<br>
+
 </div>
 
-<br>
+## About
+
+### What makes Ludo special?
+
+The problem with most, if not all, todo apps and kanban boards is that you have to spend time moving items around and manually updating the board. Ludo uses automation to make your life easier.
+
+In the default Kanban board, items are moved automatically based on the stage of development. Items in 'In Progress' are automatically moved to 'In Review' when Ludo sees that a pull request has been opened on that branch. Then, when the pull request is merged, the item is put in 'Done'.
 
 ## Run
 
