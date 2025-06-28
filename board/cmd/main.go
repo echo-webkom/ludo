@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/echo-webkom/ludo/board/config"
 	"github.com/echo-webkom/ludo/board/server"
 )
@@ -8,4 +10,6 @@ import (
 func main() {
 	config := config.Load()
 	_ = server.New(config)
+
+	http.ListenAndServe(config.Port, http.FileServer(http.Dir("web")))
 }
