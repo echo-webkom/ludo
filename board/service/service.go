@@ -1,15 +1,63 @@
 package service
 
-import "github.com/echo-webkom/ludo/api/database"
+import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"net/http"
+	"path"
+
+	"github.com/echo-webkom/ludo/api/database"
+	"github.com/echo-webkom/ludo/board/config"
+)
 
 type LudoService struct {
+	config *config.Config
 }
 
 func New() *LudoService {
 	return &LudoService{}
 }
 
+// Send request to API using config URL. Method should be "GET", "POST" etc. Endpoint is the
+// target endpoint, eg. "/users/12482", notice path values should already be formatted. body
+// is the request body, a reference to the object you want to encode as json, nil for empty
+// body. response is a reference to the response type, or nil for no response.
+func (l *LudoService) request(method string, endpoint string, body any, response any) error {
+	var bodyReader *bytes.Reader
+	if body != nil {
+		bodyJson, err := json.Marshal(body)
+		if err != nil {
+			return err
+		}
+		bodyReader = bytes.NewReader(bodyJson)
+	}
+
+	path := path.Join(l.config.ApiUrl, endpoint)
+	req, err := http.NewRequest(method, path, bodyReader)
+	if err != nil {
+		return err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if response != nil {
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal(b, response)
+	}
+
+	return err
+}
+
 func (l *LudoService) GetAllUsers() (users []database.User, err error) {
+	err = l.request("GET", "/users", nil, &users)
 	return users, err
 }
 
@@ -30,6 +78,7 @@ func (l *LudoService) DeleteUser(id uint) error {
 }
 
 func (l *LudoService) GetAllBoards() (boards []database.Board, err error) {
+	err = l.request("GET", "/boards", nil, &boards)
 	return boards, err
 }
 
@@ -70,6 +119,7 @@ func (l *LudoService) GetAllItemsInBoardList(boardId, list uint) (items []databa
 }
 
 func (l *LudoService) GetAllItems() (items []database.Item, err error) {
+	err = l.request("GET", "/items", nil, &items)
 	return items, err
 }
 
