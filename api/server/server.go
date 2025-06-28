@@ -22,8 +22,9 @@ func New(config *config.Config, db database.Database) *Server {
 	r.Use(middleware.Logger)
 
 	r.Get("/ping", pingHandler())
-	r.Mount("/users", usersRouter(service))
-
+	r.Mount("/users", usersRouter(db))
+	r.Mount("/items", itemRouter(db))
+	
 
 	return &Server{
 		router: r,
