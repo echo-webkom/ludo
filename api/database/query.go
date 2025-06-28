@@ -12,6 +12,10 @@ func (db *tursoDB) GetUserById(id uint) (User, error) {
 	return user, nil
 }
 
+func (db *tursoDB) UpdateUser(id uint, user User) error {
+	return nil
+}
+
 func (db *tursoDB) CreateUser(user User) (uint, error) {
 	if res := db.db.Create(&user); res.Error != nil {
 		return 0, errors.New("could not create a new user")
@@ -42,11 +46,11 @@ func (db *tursoDB) GetItemById(id uint) (Item, error) {
 	return item, nil
 }
 
-func (db *tursoDB) CreateItem(item Item) error {
+func (db *tursoDB) CreateItem(item Item) (uint, error) {
 	if res := db.db.Create(&item); res.Error != nil {
-		return errors.New("could not create	item")
+		return 0, errors.New("could not create	item")
 	}
-	return nil
+	return item.ID, nil
 }
 
 func (db *tursoDB) GetAllItems() ([]Item, error) {
@@ -79,16 +83,9 @@ func (db *tursoDB) MoveItemToList(id uint, list uint) error {
 	return nil
 }
 
-func (db *tursoDB) ChangeItemTitle(id uint, title string) error {
-	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("title", title); res.Error != nil {
-		return errors.New("could not change item title")
-	}
-	return nil
-}
-
-func (db *tursoDB) ChangeItemDescription(id uint, description string) error {
-	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("description", description); res.Error != nil {
-		return errors.New("could not change item description")
+func (db *tursoDB) UpdateItem(id uint, item Item) error {
+	if res := db.db.Model(&item).Where("id = ?", id).Updates(item); res.Error != nil {
+		return  errors.New("could not update item")
 	}
 	return nil
 }
