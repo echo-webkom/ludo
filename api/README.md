@@ -11,7 +11,7 @@ Users are not accounts. You are not _logged in_ as your user. Users are simply u
 | Method | Path              | Response Type | Description             |
 | ------ | ----------------- | ------------- | ----------------------- |
 | GET    | `/users`          | `User[]`      | Get all users           |
-| POST   | `/users`          | -             | Create new user         |
+| POST   | `/users`          | `ID`          | Create new user         |
 | GET    | `/users/{userId}` | `User`        | Get user by ID          |
 | PATCH  | `/users/{userId}` | -             | Update an existing user |
 | DELETE | `/users/{userId}` | -             | Delete a user           |
@@ -23,7 +23,7 @@ Boards are containers for items and have users assosiated with them. A board may
 | Method | Path                                     | Response Type | Description                 |
 | ------ | ---------------------------------------- | ------------- | --------------------------- |
 | GET    | `/boards`                                | `Board[]`     | Get all boards              |
-| POST   | `/boards`                                | -             | Create new board            |
+| POST   | `/boards`                                | `ID`          | Create new board            |
 | GET    | `/boards/{boardId}`                      | `Board`       | Get board by ID             |
 | PATCH  | `/boards/{boardId}`                      | -             | Update an existing board    |
 | DELETE | `/boards/{boardId}`                      | -             | Delete a board              |
@@ -38,7 +38,7 @@ Boards are containers for items and have users assosiated with them. A board may
 | Method | Path                            | Response Type | Description                  |
 | ------ | ------------------------------- | ------------- | ---------------------------- |
 | GET    | `/items`                        | `[]Item`      | Get all items                |
-| POST   | `/items`                        | -             | Create an item               |
+| POST   | `/items`                        | `ID`          | Create an item               |
 | GET    | `/items/{itemId}`               | `Item`        | Get item by ID               |
 | PATCH  | `/items/{itemId}`               | -             | Update an existing item      |
 | DELETE | `/items/{itemId}`               | -             | Delete an item               |
@@ -81,3 +81,12 @@ All field names are identical to the ones found in the JSON response data.
 | branch      | string | Name of branch this item is tracking |
 | createdAt   | uint   | Unix time of creation                |
 | updatedAt   | uint   | Unix time of last update             |
+
+### ID
+
+When creating new objects you get its ID in response.
+
+| Field | Type | Description      |
+| ----- | ---- | ---------------- |
+| id    | uint | ID of new object |
+
