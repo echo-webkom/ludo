@@ -9,9 +9,11 @@ type Database interface {
 	DeleteUserById(id uint) error
 	GetAllItems() ([]Item, error)
 	// Create new item, returns its ID.
-	CreateItem(item Item) error
+	CreateItem(item Item) (uint, error)
 	GetItemById(id uint) (Item, error)
 	DeleteItemByID(id uint) error
 	GetAllItemsFromList(boardId, list uint) ([]Item, error)
 	MoveItemToList(id uint, list uint) error
+	UpdateUser(id uint, user User) error
+	UpdateItem(id uint, item Item) error
 }
