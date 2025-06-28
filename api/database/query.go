@@ -12,11 +12,11 @@ func (db *tursoDB) GetUserById(id uint) (User, error) {
 	return user, nil
 }
 
-func (db *tursoDB) CreateUser(displayName, githubUsername string) error {
-	if res := db.db.Create(User{DisplayName: displayName, GithubUsername: githubUsername}); res.Error != nil {
-		return errors.New("could not create a new user")
+func (db *tursoDB) CreateUser(user User) (uint, error) {
+	if res := db.db.Create(&user); res.Error != nil {
+		return 0, errors.New("could not create a new user")
 	}
-	return nil
+	return user.ID, nil
 }
 
 func (db *tursoDB) DeleteUserById(id uint) error {
@@ -64,7 +64,7 @@ func (db *tursoDB) DeleteItemByID(id uint) error {
 	return nil
 }
 
-func (db *tursoDB) GetAllItemsFromLits(list uint) ([]Item, error) {
+func (db *tursoDB) GetAllItemsFromList(boardId, list uint) ([]Item, error) {
 	var items []Item
 	if res := db.db.Find(&items, "list = ?", list); res.Error != nil {
 		return nil, errors.New("could not find all items from list")

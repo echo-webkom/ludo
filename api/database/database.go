@@ -1,16 +1,17 @@
 package database
 
 type Database interface {
-	// Username must be identical to GitHub username.
-	CreateUser(displayName, githubUsername string) error
-	GetUserById(id uint) (User, error)
-	DeleteUserById(id uint) error
 	GetAllUsers() ([]User, error)
-
-	GetItemById(id uint) (Item, error)
-	CreateItem(item Item) error
+	// Create new user, returns its ID.
+	CreateUser(user User) (id uint, err error)
+	GetUserById(id uint) (User, error)
+	// Delete a user and remove it from all boards.
+	DeleteUserById(id uint) error
 	GetAllItems() ([]Item, error)
+	// Create new item, returns its ID.
+	CreateItem(item Item) error
+	GetItemById(id uint) (Item, error)
 	DeleteItemByID(id uint) error
-	GetAllItemsFromLits(list uint) ([]Item, error)
+	GetAllItemsFromList(boardId, list uint) ([]Item, error)
 	MoveItemToList(id uint, list uint) error
 }

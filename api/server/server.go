@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/echo-webkom/ludo/api/config"
-	"github.com/echo-webkom/ludo/api/service"
+	"github.com/echo-webkom/ludo/api/database"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jesperkha/notifier"
@@ -17,7 +17,7 @@ type Server struct {
 	router http.Handler
 }
 
-func New(config *config.Config, service *service.Service) *Server {
+func New(config *config.Config, db database.Database) *Server {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 

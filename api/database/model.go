@@ -1,27 +1,35 @@
 package database
 
 import (
-	"gorm.io/gorm"
+	"time"
 )
 
+type model struct {
+	ID        uint      `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
 type Board struct {
-	gorm.Model
+	model
+	Items []Item `json:"items"`
+	Users []User `gorm:"many2many:board_users;" json:"users"`
 }
 
 type Item struct {
-	gorm.Model
-	RepoName        string
-	RepoURL         string
-	Title           string
-	Description     string
-	Creator         User
-	Assignee        User
-	ConnectedBranch string
-	List            uint
+	model
+	RepoName        string `json:"repoName"`
+	RepoURL         string `json:"repoURL"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	ConnectedBranch string `json:"connectedBranch"`
+	List            uint   `json:"list"`
+	Creator         User   `gorm:"many2many:item_user;" json:"creator"`
+	Assignee        User   `gorm:"many2many:item_user;" json:"assignee"`
 }
 
 type User struct {
-	gorm.Model
-	DisplayName    string
-	GithubUsername string
+	model
+	DisplayName    string `json:"displayName"`
+	GithubUsername string `json:"githubUsername"`
 }
