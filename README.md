@@ -29,7 +29,7 @@ go run cmd/main.go
 
 Ludo has a central API which handles interacting with the database and GitHub. The API is meant to be a generic tool to create different kinds of project management applications, or _boards_. Ludo only assigns basic relations between models such as items and boards, and allowes the board client to determine how everything should work.
 
-The API is also designed to be easily self-hosteable using a SQLite backend.
+The API is also designed to be easily self-hostable using a SQLite backend.
 
 <div align="center">
 
