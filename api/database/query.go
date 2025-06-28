@@ -12,8 +12,8 @@ func (db *tursoDB) GetUserById(id uint) (User, error) {
 	return user, nil
 }
 
-func (db *tursoDB) CreateUser(name string) error {
-	if res := db.db.Create(User{Name: name}); res.Error != nil {
+func (db *tursoDB) CreateUser(displayName, githubUsername string) error {
+	if res := db.db.Create(User{DisplayName: displayName, GithubUsername: githubUsername}); res.Error != nil {
 		return errors.New("could not create a new user")
 	}
 	return nil
@@ -64,7 +64,7 @@ func (db *tursoDB) DeleteItemByID(id uint) error {
 	return nil
 }
 
-func (db *tursoDB) GetAllItemsFromLits(list List) ([]Item, error) {
+func (db *tursoDB) GetAllItemsFromLits(list uint) ([]Item, error) {
 	var items []Item
 	if res := db.db.Find(&items, "list = ?", list); res.Error != nil {
 		return nil, errors.New("could not find all items from list")
@@ -72,7 +72,7 @@ func (db *tursoDB) GetAllItemsFromLits(list List) ([]Item, error) {
 	return items, nil
 }
 
-func (db *tursoDB) MoveItemToList(id uint, list List) error {
+func (db *tursoDB) MoveItemToList(id uint, list uint) error {
 	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("list", list); res.Error != nil {
 		return errors.New("could not move item")
 	}
@@ -89,21 +89,6 @@ func (db *tursoDB) ChangeItemTitle(id uint, title string) error {
 func (db *tursoDB) ChangeItemDescription(id uint, description string) error {
 	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("description", description); res.Error != nil {
 		return errors.New("could not change item description")
-	}
-	return nil
-}
-
-func (db *tursoDB) CreateNewRepo(name, url string) error {
-	repo := Repo{Name: name, URL: url}
-	if res := db.db.Create(&repo); res.Error != nil {
-		return errors.New("could not create new user")
-	}
-	return nil
-}
-
-func (db *tursoDB) DeleteRepoById(id uint) error {
-	if res := db.db.Delete(&Repo{}, id); res.Error != nil {
-		return errors.New("could not delet the repo")
 	}
 	return nil
 }

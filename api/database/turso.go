@@ -32,7 +32,7 @@ func NewTursoDB(config *config.Config) Database {
 		log.Fatal("could not load remote database", err)
 	}
 
-	if err := db.AutoMigrate(&Item{}, &User{}, &Repo{}); err != nil {
+	if err := db.AutoMigrate(&Item{}, &User{}, &Board{}); err != nil {
 		log.Fatalf("migration: %v", err)
 	}
 	return &tursoDB{db}

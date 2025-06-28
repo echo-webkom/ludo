@@ -4,37 +4,24 @@ import (
 	"gorm.io/gorm"
 )
 
-type List int
-
-const (
-	BACKLOG = iota
-	TODO
-	DOING
-	REVIEW
-	DONE
-)
+type Board struct {
+	gorm.Model
+}
 
 type Item struct {
 	gorm.Model
-	RepoID          uint
-	Repo            Repo
+	RepoName        string
+	RepoURL         string
 	Title           string
 	Description     string
-	CreatorID       uint
 	Creator         User
-	AssigneeID      uint
 	Assignee        User
 	ConnectedBranch string
-	List            List
+	List            uint
 }
 
 type User struct {
 	gorm.Model
-	Name string
-}
-
-type Repo struct {
-	gorm.Model
-	Name string
-	URL  string
+	DisplayName    string
+	GithubUsername string
 }
