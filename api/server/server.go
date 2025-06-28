@@ -22,7 +22,7 @@ func New(config *config.Config, db database.Database) *Server {
 	r.Use(middleware.Logger)
 
 	r.Get("/ping", pingHandler())
-	r.Mount("/users", usersRouter())
+	r.Mount("/users", usersRouter(service))
 
 
 	return &Server{
