@@ -42,11 +42,11 @@ func (db *Database) GetItemById(id uint) (Item, error) {
 	return item, nil
 }
 
-func (db *Database) CreateItem(item Item) error {
+func (db *Database) CreateItem(item Item) (id uint, err error) {
 	if res := db.db.Create(&item); res.Error != nil {
-		return errors.New("could not create	item")
+		return id, errors.New("could not create	item")
 	}
-	return nil
+	return item.ID, nil
 }
 
 func (db *Database) GetAllItems() ([]Item, error) {
