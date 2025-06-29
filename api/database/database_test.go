@@ -7,13 +7,13 @@ import (
 
 func assert(t *testing.T, v bool, msg string, args ...any) {
 	if !v {
-		t.Errorf(msg, args...)
+		t.Fatalf(msg, args...)
 	}
 }
 
 func assertNoErr(t *testing.T, err error) {
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 
@@ -130,9 +130,10 @@ func TestDatabase(t *testing.T) {
 	})
 
 	t.Run("Delete item", func(t *testing.T) {
-		id, _ := db.CreateItem(Item{})
+		id, err := db.CreateItem(Item{})
+		assertNoErr(t, err)
 
-		err := db.DeleteItemByID(id)
+		err = db.DeleteItemByID(id)
 		assertNoErr(t, err)
 
 		_, err = db.GetItemById(id)
@@ -141,6 +142,7 @@ func TestDatabase(t *testing.T) {
 
 	t.Run("Delete user", func(t *testing.T) {
 		id, err := db.CreateUser(User{})
+		assertNoErr(t, err)
 
 		err = db.DeleteUserById(id)
 		assertNoErr(t, err)

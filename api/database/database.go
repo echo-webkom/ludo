@@ -8,6 +8,7 @@ import (
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Database struct {
@@ -23,7 +24,9 @@ func newDatabase(db *gorm.DB) *Database {
 
 func NewTurso(url, token string) *Database {
 	dbUrl := url + token
-	db, err := gorm.Open(sqlite.Open(dbUrl), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(dbUrl), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
@@ -36,7 +39,9 @@ func NewSQLite(filename string) *Database {
 		filename = "file:" + filename
 	}
 
-	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
