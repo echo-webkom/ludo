@@ -1,40 +1,49 @@
 package database
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
-type List int
+// Copy of gorm.Model with JSON tags
+type Model struct {
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
 
-const (
-	BACKLOG = iota
-	TODO
-	DOING
-	REVIEW
-	DONE
-)
+// Used in API response when creating objects.
+type ID struct {
+	ID uint `json:"id"`
+}
+
+type Board struct {
+	Model
+	Items []Item `gorm:"foreignKey:BoardID" json:"items"`
+	Users []User `gorm:"many2many:board_users;" json:"users"`
+}
 
 type Item struct {
-	gorm.Model
-	RepoID          uint
-	Repo            Repo
-	Title           string
-	Description     string
-	CreatorID       uint
-	Creator         User
-	AssigneeID      uint
-	Assignee        User
-	ConnectedBranch string
-	List            List
+	Model
+	BoardID         uint   `json:"boardId"`
+	RepoName        string `json:"repoName"`
+	RepoURL         string `json:"repoURL"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	ConnectedBranch string `json:"connectedBranch"`
+	List            uint   `json:"list"`
+
+	CreatorID uint `json:"-"`
+	Creator   User `gorm:"foreignKey:CreatorID" json:"creator"`
+
+	AssigneeID uint `json:"-"`
+	Assignee   User `gorm:"foreignKey:AssigneeID" json:"assignee"`
 }
 
 type User struct {
-	gorm.Model
-	Name string
-}
-
-type Repo struct {
-	gorm.Model
-	Name string
-	URL  string
+	Model
+	DisplayName    string `json:"displayName"`
+	GithubUsername string `json:"githubUsername"`
 }

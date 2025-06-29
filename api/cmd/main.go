@@ -5,16 +5,17 @@ import (
 	"syscall"
 
 	"github.com/echo-webkom/ludo/api/config"
+	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/server"
-	"github.com/echo-webkom/ludo/api/service"
 	"github.com/jesperkha/notifier"
 )
 
 func main() {
 	config := config.Load()
 	notif := notifier.New()
-	service := service.New(config)
-	server := server.New(config, service)
+	// db := database.NewTurso(config.TursoURL, config.TursoToken)
+	db := database.NewSQLite(config.DatabaseURL)
+	server := server.New(config, db)
 
 	go server.ListenAndServe(notif)
 

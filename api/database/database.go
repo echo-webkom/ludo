@@ -1,22 +1,53 @@
 package database
 
-type Database interface {
-	GetUserById(id uint) (User, error)
-	DeleteUserById(id uint) error
-	GetAllUsers() ([]User, error)
+import (
+	"log"
+	"strings"
 
-	GetItemById(id uint) (Item, error)
-	CreateItem(item Item) error
-	GetAllItems() ([]Item, error)
-	DeleteItemByID(id uint) error
-	GetAllItemsFromLits(list List) ([]Item, error)
-	MoveItemToList(id uint, list List) error
-	ChangeItemTitle(id uint, title string) error
-	ChangeItemDescription(id uint, description string) error
+	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
 
-	CreateNewRepo(name, url string) error
-	DeleteRepoById(id uint) error
+type Database struct {
+	db *gorm.DB
+}
 
-	// Username must be identical to GitHub username.
-	CreateUser(username string) error
+func newDatabase(db *gorm.DB) *Database {
+	if err := db.AutoMigrate(&Board{}, &Item{}, &User{}); err != nil {
+		log.Fatalf("migration: %v", err)
+	}
+	return &Database{db}
+}
+
+func NewTurso(url, token string) *Database {
+	dbUrl := url + token
+	db, err := gorm.Open(sqlite.Open(dbUrl), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+
+	return newDatabase(db)
+}
+
+func NewSQLite(filename string) *Database {
+	if !strings.HasPrefix(filename, "file:") {
+		filename = "file:" + filename
+	}
+
+	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+
+	return newDatabase(db)
+}
+
+func (db *Database) Close() error {
+	raw, err := db.db.DB()
+	if err != nil {
+		return err
+	}
+	return raw.Close()
 }
