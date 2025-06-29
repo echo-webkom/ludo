@@ -12,6 +12,7 @@ func (db *tursoDB) GetUserById(id uint) (User, error) {
 	return user, nil
 }
 
+// TODO: do this
 func (db *tursoDB) UpdateUser(id uint, user User) error {
 	return nil
 }
@@ -86,6 +87,45 @@ func (db *tursoDB) MoveItemToList(id uint, list uint) error {
 func (db *tursoDB) UpdateItem(id uint, item Item) error {
 	if res := db.db.Model(&item).Where("id = ?", id).Updates(item); res.Error != nil {
 		return  errors.New("could not update item")
+	}
+	return nil
+}
+
+
+func (db *tursoDB) GetAllBoards() ([]Board, error) {
+	var boards []Board
+	if res := db.db.Find(&boards); res.Error != nil {
+		return nil, errors.New("could not find boards")
+	}
+
+	return boards, nil
+}
+
+func (db *tursoDB) CreateBoard(board Board) (uint, error) {
+	if res := db.db.Create(&board); res.Error != nil {
+		return 0, errors.New("could not create a new board")
+	}
+	return board.ID, nil
+}
+
+func (db *tursoDB) GetBoardById(id uint) (Board, error) {
+	var board Board
+	if res := db.db.First(&board, id); res.Error != nil {
+		return Board{}, errors.New("courld not find board")
+	}
+	return  board, nil
+}
+
+func (db *tursoDB) UpdateBoard(id uint, board Board) error {
+	if res := db.db.Model(&board).Where("id = ?", id).Updates(board); res.Error != nil {
+		return errors.New("could not update board")
+	}
+	return nil
+}
+
+func (db *tursoDB) DeleteBoardById(id uint) error {
+	if res := db.db.Delete(Board{}, id); res.Error != nil {
+		return errors.New("could not delete board")
 	}
 	return nil
 }

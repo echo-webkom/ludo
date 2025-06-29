@@ -16,4 +16,9 @@ type Database interface {
 	MoveItemToList(id uint, list uint) error
 	UpdateUser(id uint, user User) error
 	UpdateItem(id uint, item Item) error
+	GetAllBoards() ([]Board, error)
+	CreateBoard(board Board) (uint, error)
+	GetBoardById(id uint) (Board, error)
+	UpdateBoard(id uint, board Board) error
+	DeleteBoardById(id uint) error
 }
