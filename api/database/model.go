@@ -14,6 +14,11 @@ type Model struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
+// Used in API response when creating objects.
+type ID struct {
+	ID uint `json:"id"`
+}
+
 type Board struct {
 	Model
 	Items []Item `gorm:"foreignKey:BoardID" json:"items"`

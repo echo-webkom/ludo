@@ -64,9 +64,9 @@ func (l *LudoService) GetAllUsers() (users []database.User, err error) {
 }
 
 func (l *LudoService) CreateUser(user database.User) (id uint, err error) {
-	// TODO: add response ID struct
-	err = l.request("POST", "/users", &user, nil)
-	return id, err
+	var idRes database.ID
+	err = l.request("POST", "/users", &user, &idRes)
+	return idRes.ID, err
 }
 
 func (l *LudoService) GetUserById(id uint) (user database.User, err error) {
@@ -88,9 +88,9 @@ func (l *LudoService) GetAllBoards() (boards []database.Board, err error) {
 }
 
 func (l *LudoService) CreateBoard(board database.Board) (id uint, err error) {
-	// TODO: add response ID struct
-	err = l.request("POST", "/boards", &board, nil)
-	return id, err
+	var idRes database.ID
+	err = l.request("POST", "/boards", &board, &idRes)
+	return idRes.ID, err
 }
 
 func (l *LudoService) GetBoardById(id uint) (board database.Board, err error) {
@@ -135,9 +135,9 @@ func (l *LudoService) GetAllItems() (items []database.Item, err error) {
 }
 
 func (l *LudoService) CreateItem(item database.Item) (id uint, err error) {
-	// TODO: add response ID struct
-	err = l.request("POST", "/items", &item, nil)
-	return id, err
+	var idRes database.ID
+	err = l.request("POST", "/items", &item, &idRes)
+	return idRes.ID, err
 }
 
 func (l *LudoService) GetItemById(id uint) (item database.Item, err error) {
