@@ -13,7 +13,8 @@ import (
 func main() {
 	config := config.Load()
 	notif := notifier.New()
-	db := database.NewTursoDB(config)
+	// db := database.NewTurso(config.TursoURL, config.TursoToken)
+	db := database.NewSQLite(config.DatabaseURL)
 	server := server.New(config, db)
 
 	go server.ListenAndServe(notif)

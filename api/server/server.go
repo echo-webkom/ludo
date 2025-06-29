@@ -17,7 +17,7 @@ type Server struct {
 	router http.Handler
 }
 
-func New(config *config.Config, db database.Database) *Server {
+func New(config *config.Config, db *database.Database) *Server {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 

@@ -19,10 +19,11 @@ func New() *LudoService {
 	return &LudoService{}
 }
 
-// Send request to API using config URL. Method should be "GET", "POST" etc. Endpoint is the
-// target endpoint, eg. "/users/12482", notice path values should already be formatted. body
-// is the request body, a reference to the object you want to encode as json, nil for empty
-// body. response is a reference to the response type, or nil for no response.
+// Send request to API using config URL. Method should be "GET", "POST" etc.
+// Endpoint is the target endpoint, eg. "/users/12482", notice path values
+// should already be formatted. body is the request body, a reference to the
+// object you want to encode as json, nil for empty body. response is a
+// reference to the response type, or nil for no response.
 func (l *LudoService) request(method string, endpoint string, body any, response any) error {
 	var bodyReader *bytes.Reader
 	if body != nil {
