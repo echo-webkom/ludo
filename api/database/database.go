@@ -32,7 +32,7 @@ func NewTurso(url, token string) *Database {
 }
 
 func NewSQLite(filename string) *Database {
-	if !strings.HasPrefix(filename, ":file") {
+	if !strings.HasPrefix(filename, "file:") {
 		filename = "file:" + filename
 	}
 
