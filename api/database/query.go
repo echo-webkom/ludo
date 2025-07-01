@@ -64,17 +64,17 @@ func (db *Database) DeleteItemByID(id uint) error {
 	return nil
 }
 
-func (db *Database) GetAllItemsFromList(boardId, list uint) ([]Item, error) {
+func (db *Database) GetAllItemsWithStatus(boardId uint, list Status) ([]Item, error) {
 	var items []Item
-	if res := db.db.Find(&items, "list = ?", list); res.Error != nil {
-		return nil, errors.New("could not find all items from list")
+	if res := db.db.Find(&items, "status = ?", list); res.Error != nil {
+		return nil, errors.New("could not find items with status")
 	}
 	return items, nil
 }
 
-func (db *Database) MoveItemToList(id uint, list uint) error {
-	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("list", list); res.Error != nil {
-		return errors.New("could not move item")
+func (db *Database) ChangeItemStatus(id uint, list Status) error {
+	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("status", list); res.Error != nil {
+		return errors.New("could not set item status")
 	}
 	return nil
 }
