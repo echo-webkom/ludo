@@ -54,7 +54,7 @@ func TestDatabase(t *testing.T) {
 			Title:           "Initial Task",
 			Description:     "Setup project",
 			ConnectedBranch: "main",
-			List:            1,
+			Status:          StatusInProgress,
 			CreatorID:       userID,
 			AssigneeID:      userID,
 		}
@@ -76,33 +76,33 @@ func TestDatabase(t *testing.T) {
 		assert(t, len(users) >= 2, "expected at least 2 users, got %d", len(users))
 	})
 
-	t.Run("Get all items from list", func(t *testing.T) {
+	t.Run("Get all items with status", func(t *testing.T) {
 		board := Board{}
 		assertNoErr(t, db.db.Create(&board).Error)
 
 		item := Item{
 			BoardID: board.ID,
-			Title:   "List Test",
-			List:    2,
+			Title:   "Status Test",
+			Status:  StatusInReview,
 		}
 		_, err := db.CreateItem(item)
 		assertNoErr(t, err)
 
-		items, err := db.GetAllItemsFromList(board.ID, 2)
+		items, err := db.GetAllItemsWithStatus(board.ID, StatusInReview)
 		assertNoErr(t, err)
-		assert(t, len(items) > 0, "expected at least 1 item in list 2")
+		assert(t, len(items) > 0, "expected at least 1 item with status 2")
 	})
 
-	t.Run("Move item to list", func(t *testing.T) {
+	t.Run("Set item status", func(t *testing.T) {
 		items, _ := db.GetAllItems()
 		item := items[0]
 
-		err := db.MoveItemToList(item.ID, 3)
+		err := db.ChangeItemStatus(item.ID, StatusClosed)
 		assertNoErr(t, err)
 
 		movedItem, err := db.GetItemById(item.ID)
 		assertNoErr(t, err)
-		assert(t, movedItem.List == 3, "item was not moved to list 3")
+		assert(t, movedItem.Status == StatusClosed, "item was not set to status 3")
 	})
 
 	t.Run("Change item title", func(t *testing.T) {
@@ -149,5 +149,17 @@ func TestDatabase(t *testing.T) {
 
 		_, err = db.GetUserById(id)
 		assert(t, err != nil, "user should have been deleted")
+	})
+
+	t.Run("Get and set item data", func(t *testing.T) {
+		id, err := db.CreateItem(Item{})
+		assertNoErr(t, err)
+
+		str := "Hello World"
+		assertNoErr(t, db.SetItemData(id, str))
+
+		data, err := db.GetItemData(id)
+		assertNoErr(t, err)
+		assert(t, data == str, "data didnt match expected value")
 	})
 }

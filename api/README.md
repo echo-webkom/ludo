@@ -70,17 +70,18 @@ All field names are identical to the ones found in the JSON response data.
 
 ### Item
 
-| Field       | Type   | Description                          |
-| ----------- | ------ | ------------------------------------ |
-| id          | uint   | Unique ID                            |
-| list        | uint   | ID of list this item is in           |
-| title       | string | Items title                          |
-| description | string | Items description                    |
-| creator     | uint   | ID of user that created this item    |
-| assignee    | uint   | ID of user this item is assigned to  |
-| branch      | string | Name of branch this item is tracking |
-| createdAt   | uint   | Unix time of creation                |
-| updatedAt   | uint   | Unix time of last update             |
+| Field       | Type   | Description                                                          |
+| ----------- | ------ | -------------------------------------------------------------------- |
+| id          | uint   | Unique ID                                                            |
+| status      | uint   | Item status. See `Status` enum.                                      |
+| title       | string | Items title                                                          |
+| description | string | Items description                                                    |
+| creator     | uint   | ID of user that created this item                                    |
+| assignee    | uint   | ID of user this item is assigned to                                  |
+| branch      | string | Name of branch this item is tracking                                 |
+| createdAt   | uint   | Unix time of creation                                                |
+| updatedAt   | uint   | Unix time of last update                                             |
+| data        | string | Additional data field. Usually for board-specific item data as JSON. |
 
 ### ID
 
@@ -89,4 +90,16 @@ When creating new objects you get its ID in response.
 | Field | Type | Description      |
 | ----- | ---- | ---------------- |
 | id    | uint | ID of new object |
+
+### Status
+
+Item status is one of the following values. They are automatically updated if the item contains github repo/branch info.
+
+| Name             | Value | Description                                              |
+| ---------------- | ----- | -------------------------------------------------------- |
+| StatusBacklog    | 0     | Item has been created with little to no details          |
+| StatusReady      | 1     | Item is ready to be worked on and has sufficient details |
+| StatusInProgress | 2     | Item is being worked on and tracks a branch              |
+| StatusInReview   | 3     | Item has a pull request open                             |
+| StatusClosed     | 4     | Items pull request was merged or closed                  |
 
