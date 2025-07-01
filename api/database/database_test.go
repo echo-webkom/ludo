@@ -150,4 +150,16 @@ func TestDatabase(t *testing.T) {
 		_, err = db.GetUserById(id)
 		assert(t, err != nil, "user should have been deleted")
 	})
+
+	t.Run("Get and set item data", func(t *testing.T) {
+		id, err := db.CreateItem(Item{})
+		assertNoErr(t, err)
+
+		str := "Hello World"
+		assertNoErr(t, db.SetItemData(id, str))
+
+		data, err := db.GetItemData(id)
+		assertNoErr(t, err)
+		assert(t, data == str, "data didnt match expected value")
+	})
 }
