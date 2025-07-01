@@ -92,3 +92,18 @@ func (db *Database) ChangeItemDescription(id uint, description string) error {
 	}
 	return nil
 }
+
+func (db *Database) SetItemData(id uint, data string) error {
+	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("data", data); res.Error != nil {
+		return errors.New("could not set data field")
+	}
+	return nil
+}
+
+func (db *Database) GetItemData(id uint) (data string, err error) {
+	var item Item
+	if res := db.db.First(&item, id); res.Error != nil {
+		return data, errors.New("item not found")
+	}
+	return item.Data, nil
+}

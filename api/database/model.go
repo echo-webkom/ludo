@@ -50,6 +50,8 @@ type Item struct {
 
 	AssigneeID uint `json:"-"`
 	Assignee   User `gorm:"foreignKey:AssigneeID" json:"assignee"`
+
+	Data string `json:"data"`
 }
 
 type User struct {

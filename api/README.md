@@ -70,17 +70,18 @@ All field names are identical to the ones found in the JSON response data.
 
 ### Item
 
-| Field       | Type   | Description                          |
-| ----------- | ------ | ------------------------------------ |
-| id          | uint   | Unique ID                            |
-| status      | uint   | Item status. See `Status` enum.      |
-| title       | string | Items title                          |
-| description | string | Items description                    |
-| creator     | uint   | ID of user that created this item    |
-| assignee    | uint   | ID of user this item is assigned to  |
-| branch      | string | Name of branch this item is tracking |
-| createdAt   | uint   | Unix time of creation                |
-| updatedAt   | uint   | Unix time of last update             |
+| Field       | Type   | Description                                                          |
+| ----------- | ------ | -------------------------------------------------------------------- |
+| id          | uint   | Unique ID                                                            |
+| status      | uint   | Item status. See `Status` enum.                                      |
+| title       | string | Items title                                                          |
+| description | string | Items description                                                    |
+| creator     | uint   | ID of user that created this item                                    |
+| assignee    | uint   | ID of user this item is assigned to                                  |
+| branch      | string | Name of branch this item is tracking                                 |
+| createdAt   | uint   | Unix time of creation                                                |
+| updatedAt   | uint   | Unix time of last update                                             |
+| data        | string | Additional data field. Usually for board-specific item data as JSON. |
 
 ### ID
 
