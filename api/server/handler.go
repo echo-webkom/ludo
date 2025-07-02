@@ -175,22 +175,38 @@ func itemsHandler(db *database.Database) chi.Router {
 		}
 	})
 
-	r.Patch("/{id}/set/{status}", func(w http.ResponseWriter, r *http.Request) {
-		var item database.Item
-		if err := getJSON(r, &item); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
+	r.Get("/{id}/data", func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "bad id", http.StatusBadRequest)
 			return
 		}
 
-		id, err1 := strconv.Atoi(r.PathValue("id"))
-		status, err2 := strconv.Atoi(r.PathValue("status"))
-		if err1 != nil || err2 != nil {
-			http.Error(w, "bad value", http.StatusBadRequest)
-			return
-		}
-
-		if err := db.ChangeItemStatus(uint(id), database.Status(status)); err != nil {
+		item, err := db.GetItemById(uint(id))
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte(item.Data))
+	})
+
+	r.Patch("/{id}/data", func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "bad id", http.StatusBadRequest)
+			return
+		}
+
+		data, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if err := db.SetItemData(uint(id), string(data)); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	})
 
