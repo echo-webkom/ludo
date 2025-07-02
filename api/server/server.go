@@ -23,6 +23,8 @@ func New(config *config.Config, db *database.Database) *Server {
 
 	r.Get("/ping", pingHandler())
 
+	r.Mount("/users", usersHandler(db))
+
 	return &Server{
 		router: r,
 		port:   config.Port,
