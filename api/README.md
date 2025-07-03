@@ -1,6 +1,6 @@
 # Ludo API documentation
 
-Ludo is comprised of users, boards, and items. Each board has a list of users, and a list of items. Each item has a list ID which specifies which list it belongs to. However, there is no list type. This is to genericize lists and make them act more like a _group_. Ludo is meant to be used for all kinds of boards and viewing options, and it should be left up to each boards implementation to organize and display items.
+Ludo is comprised of users, boards, and items. Each board has a list of users, and a list of items.
 
 ## Endpoints
 
@@ -20,29 +20,30 @@ Users are not accounts. You are not _logged in_ as your user. Users are simply u
 
 Boards are containers for items and have users assosiated with them. A board may be connected to a GitHub repo.
 
-| Method | Path                                     | Response Type | Description                 |
-| ------ | ---------------------------------------- | ------------- | --------------------------- |
-| GET    | `/boards`                                | `Board[]`     | Get all boards              |
-| POST   | `/boards`                                | `ID`          | Create new board            |
-| GET    | `/boards/{boardId}`                      | `Board`       | Get board by ID             |
-| PATCH  | `/boards/{boardId}`                      | -             | Update an existing board    |
-| DELETE | `/boards/{boardId}`                      | -             | Delete a board              |
-| GET    | `/boards/{boardId}/users`                | `[]User`      | Get all users in board      |
-| GET    | `/boards/{boardId}/items`                | `[]Item`      | Get all items in board      |
-| POST   | `/boards/{boardId}/users/{userId}`       | -             | Add user to board           |
-| DELETE | `/boards/{boardId}/users/{userId}`       | -             | Remove user from board      |
-| GET    | `/boards/{boardId}/lists/{listId}/items` | `[]Item`      | Get all items in board list |
+| Method | Path                                      | Response Type | Description                                |
+| ------ | ----------------------------------------- | ------------- | ------------------------------------------ |
+| GET    | `/boards`                                 | `Board[]`     | Get all boards                             |
+| POST   | `/boards`                                 | `ID`          | Create new board                           |
+| GET    | `/boards/{boardId}`                       | `Board`       | Get board by ID                            |
+| PATCH  | `/boards/{boardId}`                       | -             | Update an existing board                   |
+| DELETE | `/boards/{boardId}`                       | -             | Delete a board                             |
+| GET    | `/boards/{boardId}/users`                 | `[]User`      | Get all users in board                     |
+| GET    | `/boards/{boardId}/items`                 | `[]Item`      | Get all items in board                     |
+| POST   | `/boards/{boardId}/users/{userId}`        | -             | Add user to board                          |
+| DELETE | `/boards/{boardId}/users/{userId}`        | -             | Remove user from board                     |
+| GET    | `/boards/{boardId}/status/{status}/items` | `[]Item`      | Get all items in board with given `Status` |
 
 ### Items
 
-| Method | Path                            | Response Type | Description                  |
-| ------ | ------------------------------- | ------------- | ---------------------------- |
-| GET    | `/items`                        | `[]Item`      | Get all items                |
-| POST   | `/items`                        | `ID`          | Create an item               |
-| GET    | `/items/{itemId}`               | `Item`        | Get item by ID               |
-| PATCH  | `/items/{itemId}`               | -             | Update an existing item      |
-| DELETE | `/items/{itemId}`               | -             | Delete an item               |
-| PATCH  | `/items/{itemId}/move/{listId}` | -             | Move an item to another list |
+| Method | Path                   | Response Type | Description             |
+| ------ | ---------------------- | ------------- | ----------------------- |
+| GET    | `/items`               | `[]Item`      | Get all items           |
+| POST   | `/items`               | `ID`          | Create an item          |
+| GET    | `/items/{itemId}`      | `Item`        | Get item by ID          |
+| PATCH  | `/items/{itemId}`      | -             | Update an existing item |
+| DELETE | `/items/{itemId}`      | -             | Delete an item          |
+| GET    | `/items/{itemId}/data` | `any`         | Get items data field    |
+| PATCH  | `/items/{itemId}/data` | -             | Update items data field |
 
 ## Schemas
 
@@ -93,7 +94,7 @@ When creating new objects you get its ID in response.
 
 ### Status
 
-Item status is one of the following values. They are automatically updated if the item contains github repo/branch info.
+Item status is one of the following values. They are automatically updated if the item contains github repo/branch info. Use the integer value as the status in requests.
 
 | Name             | Value | Description                                              |
 | ---------------- | ----- | -------------------------------------------------------- |
@@ -102,4 +103,3 @@ Item status is one of the following values. They are automatically updated if th
 | StatusInProgress | 2     | Item is being worked on and tracks a branch              |
 | StatusInReview   | 3     | Item has a pull request open                             |
 | StatusClosed     | 4     | Items pull request was merged or closed                  |
-

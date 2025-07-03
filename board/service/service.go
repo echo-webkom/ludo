@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path"
+	"net/url"
 
 	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/board/config"
@@ -16,17 +16,20 @@ type LudoService struct {
 	config *config.Config
 }
 
-func New() *LudoService {
-	return &LudoService{}
+func New(config *config.Config) *LudoService {
+	return &LudoService{
+		config: config,
+	}
 }
 
 // Send request to API using config URL. Method should be "GET", "POST" etc.
+//
 // Endpoint is the target endpoint, eg. "/users/12482", notice path values
-// should already be formatted. body is the request body, a reference to the
-// object you want to encode as json, nil for empty body. response is a
+// should already be formatted. Body is the request body, a reference to the
+// object you want to encode as json, nil for empty body. Response is a
 // reference to the response type, or nil for no response.
 func (l *LudoService) request(method, endpoint string, body, response any) error {
-	var bodyReader *bytes.Reader
+	var bodyReader io.Reader
 	if body != nil {
 		bodyJson, err := json.Marshal(body)
 		if err != nil {
@@ -35,8 +38,12 @@ func (l *LudoService) request(method, endpoint string, body, response any) error
 		bodyReader = bytes.NewReader(bodyJson)
 	}
 
-	path := path.Join(l.config.ApiUrl, endpoint)
-	req, err := http.NewRequest(method, path, bodyReader)
+	url, err := url.JoinPath(l.config.ApiUrl, endpoint)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
 		return err
 	}
@@ -47,7 +54,7 @@ func (l *LudoService) request(method, endpoint string, body, response any) error
 	}
 	defer res.Body.Close()
 
-	if response != nil {
+	if res.StatusCode == http.StatusOK && response != nil {
 		b, err := io.ReadAll(res.Body)
 		if err != nil {
 			return err

@@ -12,8 +12,6 @@ type Config struct {
 	Port            string
 	DatabaseURL     string
 	DatabaseToken   string
-	IsDev           bool
-	DBFile          string
 	GitHubAuthToken string
 }
 
