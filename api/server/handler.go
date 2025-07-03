@@ -41,6 +41,7 @@ func getJSON(r *http.Request, v any) error {
 func usersHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
+	// Get all users
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		users, err := db.GetAllUsers()
 		if err != nil {
@@ -51,6 +52,7 @@ func usersHandler(db *database.Database) chi.Router {
 		respondJSON(w, &users)
 	})
 
+	// Create user
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 		var user database.User
 		if err := getJSON(r, &user); err != nil {
@@ -67,6 +69,7 @@ func usersHandler(db *database.Database) chi.Router {
 		respondJSON(w, &database.ID{ID: id})
 	})
 
+	// Get user by id
 	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -83,16 +86,27 @@ func usersHandler(db *database.Database) chi.Router {
 		respondJSON(w, &user)
 	})
 
+	// Update user
 	r.Patch("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		userId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "bad user id", http.StatusBadRequest)
+			return
+		}
+
 		var user database.User
 		if err := getJSON(r, &user); err != nil {
 			http.Error(w, "bad request data", http.StatusBadRequest)
 			return
 		}
 
-		// err := db.UpdateUser()
+		if err := db.UpdateUser(user, uint(userId)); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	})
 
+	// Delete user by id
 	r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -111,6 +125,7 @@ func usersHandler(db *database.Database) chi.Router {
 func itemsHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
+	// Get all items
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		items, err := db.GetAllItems()
 		if err != nil {
@@ -121,6 +136,7 @@ func itemsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &items)
 	})
 
+	// Create item
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 		var item database.Item
 		if err := getJSON(r, &item); err != nil {
@@ -137,6 +153,7 @@ func itemsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &database.ID{ID: id})
 	})
 
+	// Get item by id
 	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -153,16 +170,27 @@ func itemsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &item)
 	})
 
+	// Update item
 	r.Patch("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		itemId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "bad item id", http.StatusBadRequest)
+			return
+		}
+
 		var item database.Item
 		if err := getJSON(r, &item); err != nil {
 			http.Error(w, "bad request data", http.StatusBadRequest)
 			return
 		}
 
-		// err := db.UpdateItem()
+		if err := db.UpdateItem(item, uint(itemId)); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	})
 
+	// Delete item by id
 	r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -175,6 +203,7 @@ func itemsHandler(db *database.Database) chi.Router {
 		}
 	})
 
+	// Get item data
 	r.Get("/{id}/data", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -191,6 +220,7 @@ func itemsHandler(db *database.Database) chi.Router {
 		w.Write([]byte(item.Data))
 	})
 
+	// Set item data
 	r.Patch("/{id}/data", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -216,6 +246,7 @@ func itemsHandler(db *database.Database) chi.Router {
 func boardsHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
+	// Get all boards
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		boards, err := db.GetAllBoards()
 		if err != nil {
@@ -225,6 +256,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &boards)
 	})
 
+	// Create board
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 		var board database.Board
 		if err := getJSON(r, &board); err != nil {
@@ -241,6 +273,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &database.ID{ID: id})
 	})
 
+	// Get board by id
 	r.Get("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err := strconv.Atoi(r.PathValue("boardId"))
 		if err != nil {
@@ -257,6 +290,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &board)
 	})
 
+	// Update board
 	r.Patch("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err := strconv.Atoi(r.PathValue("boardId"))
 		if err != nil {
@@ -276,6 +310,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		}
 	})
 
+	// Delete baord
 	r.Delete("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err := strconv.Atoi(r.PathValue("boardId"))
 		if err != nil {
@@ -289,6 +324,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		}
 	})
 
+	// Get all users in board
 	r.Get("/{boardId}/users", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err := strconv.Atoi(r.PathValue("boardId"))
 		if err != nil {
@@ -305,6 +341,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &users)
 	})
 
+	// Get all items in board
 	r.Get("/{boardId}/items", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err := strconv.Atoi(r.PathValue("boardId"))
 		if err != nil {
@@ -321,6 +358,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		respondJSON(w, &items)
 	})
 
+	// Add user to board
 	r.Post("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err1 := strconv.Atoi(r.PathValue("boardId"))
 		userId, err2 := strconv.Atoi(r.PathValue("userId"))
@@ -335,6 +373,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		}
 	})
 
+	// Remove user from board
 	r.Delete("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err1 := strconv.Atoi(r.PathValue("boardId"))
 		userId, err2 := strconv.Atoi(r.PathValue("userId"))
@@ -349,6 +388,7 @@ func boardsHandler(db *database.Database) chi.Router {
 		}
 	})
 
+	// Get all items with status
 	r.Get("/{boardId}/status/{status}/items", func(w http.ResponseWriter, r *http.Request) {
 		boardId, err := strconv.Atoi(r.PathValue("boardId"))
 		if err != nil {

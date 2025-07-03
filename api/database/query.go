@@ -172,3 +172,17 @@ func (d *Database) GetBoardItemsByStatus(boardId uint, status Status) ([]Item, e
 	}
 	return items, nil
 }
+
+func (db *Database) UpdateItem(item Item, id uint) error {
+	if err := db.db.Model(&Item{}).Where("id = ?", id).Updates(item).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Database) UpdateUser(user User, id uint) error {
+	if err := db.db.Model(&User{}).Where("id = ?", id).Updates(user).Error; err != nil {
+		return err
+	}
+	return nil
+}
