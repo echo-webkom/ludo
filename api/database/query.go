@@ -79,20 +79,6 @@ func (db *Database) ChangeItemStatus(id uint, list Status) error {
 	return nil
 }
 
-func (db *Database) ChangeItemTitle(id uint, title string) error {
-	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("title", title); res.Error != nil {
-		return errors.New("could not change item title")
-	}
-	return nil
-}
-
-func (db *Database) ChangeItemDescription(id uint, description string) error {
-	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("description", description); res.Error != nil {
-		return errors.New("could not change item description")
-	}
-	return nil
-}
-
 func (db *Database) SetItemData(id uint, data string) error {
 	if res := db.db.Model(&Item{}).Where("id = ?", id).Update("data", data); res.Error != nil {
 		return errors.New("could not set data field")

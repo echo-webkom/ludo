@@ -105,30 +105,6 @@ func TestDatabase(t *testing.T) {
 		assert(t, movedItem.Status == StatusClosed, "item was not set to status 3")
 	})
 
-	t.Run("Change item title", func(t *testing.T) {
-		items, _ := db.GetAllItems()
-		item := items[0]
-
-		err := db.ChangeItemTitle(item.ID, "Updated Title")
-		assertNoErr(t, err)
-
-		updatedItem, err := db.GetItemById(item.ID)
-		assertNoErr(t, err)
-		assert(t, updatedItem.Title == "Updated Title", "title not updated correctly")
-	})
-
-	t.Run("Change item description", func(t *testing.T) {
-		items, _ := db.GetAllItems()
-		item := items[0]
-
-		err := db.ChangeItemDescription(item.ID, "New Description")
-		assertNoErr(t, err)
-
-		updatedItem, err := db.GetItemById(item.ID)
-		assertNoErr(t, err)
-		assert(t, updatedItem.Description == "New Description", "description not updated correctly")
-	})
-
 	t.Run("Delete item", func(t *testing.T) {
 		id, err := db.CreateItem(Item{})
 		assertNoErr(t, err)
