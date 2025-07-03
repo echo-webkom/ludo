@@ -97,11 +97,11 @@ func (db *Database) GetAllBoards() (boards []Board, err error) {
 	return boards, err
 }
 
-func (db *Database) CreateBoard(board Board) error {
+func (db *Database) CreateBoard(board Board) (id uint, err error) {
 	if err := db.db.Create(&board).Error; err != nil {
-		return err
+		return id, err
 	}
-	return nil
+	return board.ID, nil
 }
 
 func (db *Database) GetBoardById(id uint) (board Board, err error) {

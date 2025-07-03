@@ -25,6 +25,7 @@ func New(config *config.Config, db *database.Database) *Server {
 
 	r.Mount("/users", usersHandler(db))
 	r.Mount("/items", itemsHandler(db))
+	r.Mount("/boards", boardsHandler(db))
 
 	return &Server{
 		router: r,
@@ -52,4 +53,8 @@ func (s *Server) ListenAndServe(notif *notifier.Notifier) {
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
+}
+
+func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }

@@ -56,7 +56,7 @@ func TestBoardMethods(t *testing.T) {
 
 	// Create board
 	board := Board{Title: "Board 1", RepoURL: "https://github.com/example/repo"}
-	err := db.CreateBoard(board)
+	_, err := db.CreateBoard(board)
 	assert.NoError(t, err)
 
 	// Get boards
@@ -89,7 +89,8 @@ func TestItemMethods(t *testing.T) {
 
 	// Create board
 	board := Board{Title: "Board", RepoURL: "url"}
-	assert.NoError(t, db.CreateBoard(board))
+	_, err := db.CreateBoard(board)
+	assert.NoError(t, err)
 	boards, _ := db.GetAllBoards()
 
 	// Create item
@@ -130,7 +131,10 @@ func TestBoardUsers(t *testing.T) {
 	user := User{DisplayName: "A"}
 	userId, _ := db.CreateUser(user)
 	board := Board{Title: "Board"}
-	assert.NoError(t, db.CreateBoard(board))
+
+	_, err := db.CreateBoard(board)
+	assert.NoError(t, err)
+
 	boards, _ := db.GetAllBoards()
 
 	// Add user to board
@@ -154,7 +158,9 @@ func TestGetBoardItemsByStatus(t *testing.T) {
 	db := createTestDB(t)
 
 	board := Board{Title: "Board"}
-	assert.NoError(t, db.CreateBoard(board))
+	_, err := db.CreateBoard(board)
+	assert.NoError(t, err)
+
 	boards, _ := db.GetAllBoards()
 
 	// Create multiple items with different statuses
