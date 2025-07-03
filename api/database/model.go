@@ -21,8 +21,10 @@ type ID struct {
 
 type Board struct {
 	Model
-	Items []Item `gorm:"foreignKey:BoardID" json:"items"`
-	Users []User `gorm:"many2many:board_users;" json:"users"`
+	Title   string `json:"title"`
+	RepoURL string `json:"repoUrl"`
+	Items   []Item `gorm:"foreignKey:BoardID" json:"items"`
+	Users   []User `gorm:"many2many:board_users;" json:"users"`
 }
 
 type Status uint
@@ -39,7 +41,7 @@ type Item struct {
 	Model
 	BoardID         uint   `json:"boardId"`
 	RepoName        string `json:"repoName"`
-	RepoURL         string `json:"repoURL"`
+	RepoURL         string `json:"repoUrl"`
 	Title           string `json:"title"`
 	Description     string `json:"description"`
 	ConnectedBranch string `json:"connectedBranch"`

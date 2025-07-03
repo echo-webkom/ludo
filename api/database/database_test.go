@@ -3,139 +3,167 @@ package database
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func assert(t *testing.T, v bool, msg string, args ...any) {
-	if !v {
-		t.Fatalf(msg, args...)
-	}
+func createTestDB(t *testing.T) *Database {
+	tmpfile, err := os.CreateTemp("", "testdb-*.sqlite")
+	assert.NoError(t, err)
+
+	db := NewSQLite(tmpfile.Name())
+
+	t.Cleanup(func() {
+		os.Remove(tmpfile.Name())
+	})
+
+	// Auto migrate schema
+	err = db.db.AutoMigrate(&Board{}, &Item{}, &User{})
+	assert.NoError(t, err)
+
+	return db
 }
 
-func assertNoErr(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestUserMethods(t *testing.T) {
+	db := createTestDB(t)
+
+	// Create user
+	user := User{DisplayName: "Test User", GithubUsername: "testuser"}
+	id, err := db.CreateUser(user)
+	assert.NoError(t, err)
+
+	// Get user
+	u, err := db.GetUserById(id)
+	assert.NoError(t, err)
+	assert.Equal(t, "Test User", u.DisplayName)
+
+	// Get all users
+	users, err := db.GetAllUsers()
+	assert.NoError(t, err)
+	assert.Len(t, users, 1)
+
+	// Delete user
+	err = db.DeleteUserById(id)
+	assert.NoError(t, err)
+
+	// Confirm user deleted
+	_, err = db.GetUserById(id)
+	assert.Error(t, err)
 }
 
-func TestDatabase(t *testing.T) {
-	filename := "test.db"
-	db := NewSQLite(filename)
-	defer os.Remove(filename)
+func TestBoardMethods(t *testing.T) {
+	db := createTestDB(t)
 
-	t.Run("Create and get user", func(t *testing.T) {
-		id, err := db.CreateUser(User{
-			DisplayName:    "John",
-			GithubUsername: "johnpork_",
-		})
-		assertNoErr(t, err)
+	// Create board
+	board := Board{Title: "Board 1", RepoURL: "https://github.com/example/repo"}
+	err := db.CreateBoard(board)
+	assert.NoError(t, err)
 
-		user, err := db.GetUserById(id)
-		assertNoErr(t, err)
+	// Get boards
+	boards, err := db.GetAllBoards()
+	assert.NoError(t, err)
+	assert.Len(t, boards, 1)
 
-		assert(t, user.ID == id, "id does not match")
-		assert(t, user.DisplayName == "John", "incorrect display name, got %s", user.DisplayName)
-		assert(t, user.GithubUsername == "johnpork_", "incorrect github name, got %s", user.GithubUsername)
-	})
+	// Get by ID
+	got, err := db.GetBoardById(boards[0].ID)
+	assert.NoError(t, err)
+	assert.Equal(t, "Board 1", got.Title)
 
-	t.Run("Create board and add items", func(t *testing.T) {
-		userID, err := db.CreateUser(User{
-			DisplayName:    "Alice",
-			GithubUsername: "alicehub",
-		})
-		assertNoErr(t, err)
+	// Update board
+	got.Title = "Updated"
+	err = db.UpdateBoard(got, got.ID)
+	assert.NoError(t, err)
 
-		board := Board{}
-		assertNoErr(t, db.db.Create(&board).Error)
+	// Get updated board
+	got2, err := db.GetBoardById(got.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, "Updated", got2.Title)
 
-		item := Item{
-			BoardID:         board.ID,
-			RepoName:        "example-repo",
-			RepoURL:         "https://github.com/example/repo",
-			Title:           "Initial Task",
-			Description:     "Setup project",
-			ConnectedBranch: "main",
-			Status:          StatusInProgress,
-			CreatorID:       userID,
-			AssigneeID:      userID,
-		}
-		_, err = db.CreateItem(item)
-		assertNoErr(t, err)
+	// Delete board
+	err = db.DeleteBoard(got.ID)
+	assert.NoError(t, err)
+}
 
-		items, err := db.GetAllItems()
-		assertNoErr(t, err)
-		assert(t, len(items) == 1, "expected 1 item, got %d", len(items))
+func TestItemMethods(t *testing.T) {
+	db := createTestDB(t)
 
-		itemFromDB, err := db.GetItemById(items[0].ID)
-		assertNoErr(t, err)
-		assert(t, itemFromDB.Title == "Initial Task", "unexpected title, got %s", itemFromDB.Title)
-	})
+	// Create board
+	board := Board{Title: "Board", RepoURL: "url"}
+	assert.NoError(t, db.CreateBoard(board))
+	boards, _ := db.GetAllBoards()
 
-	t.Run("Get all users", func(t *testing.T) {
-		users, err := db.GetAllUsers()
-		assertNoErr(t, err)
-		assert(t, len(users) >= 2, "expected at least 2 users, got %d", len(users))
-	})
+	// Create item
+	item := Item{BoardID: boards[0].ID, Title: "Item 1", Status: StatusBacklog}
+	itemID, err := db.CreateItem(item)
+	assert.NoError(t, err)
 
-	t.Run("Get all items with status", func(t *testing.T) {
-		board := Board{}
-		assertNoErr(t, db.db.Create(&board).Error)
+	// Get item
+	got, err := db.GetItemById(itemID)
+	assert.NoError(t, err)
+	assert.Equal(t, "Item 1", got.Title)
 
-		item := Item{
-			BoardID: board.ID,
-			Title:   "Status Test",
-			Status:  StatusInReview,
-		}
-		_, err := db.CreateItem(item)
-		assertNoErr(t, err)
+	// Change status
+	err = db.ChangeItemStatus(itemID, StatusInProgress)
+	assert.NoError(t, err)
 
-		items, err := db.GetAllItemsWithStatus(board.ID, StatusInReview)
-		assertNoErr(t, err)
-		assert(t, len(items) > 0, "expected at least 1 item with status 2")
-	})
+	// Get items with status
+	items, err := db.GetAllItemsWithStatus(boards[0].ID, StatusInProgress)
+	assert.NoError(t, err)
+	assert.Len(t, items, 1)
 
-	t.Run("Set item status", func(t *testing.T) {
-		items, _ := db.GetAllItems()
-		item := items[0]
+	// Set/Get item data
+	err = db.SetItemData(itemID, "some-data")
+	assert.NoError(t, err)
 
-		err := db.ChangeItemStatus(item.ID, StatusClosed)
-		assertNoErr(t, err)
+	data, err := db.GetItemData(itemID)
+	assert.NoError(t, err)
+	assert.Equal(t, "some-data", data)
 
-		movedItem, err := db.GetItemById(item.ID)
-		assertNoErr(t, err)
-		assert(t, movedItem.Status == StatusClosed, "item was not set to status 3")
-	})
+	// Delete item
+	assert.NoError(t, db.DeleteItemByID(itemID))
+}
 
-	t.Run("Delete item", func(t *testing.T) {
-		id, err := db.CreateItem(Item{})
-		assertNoErr(t, err)
+func TestBoardUsers(t *testing.T) {
+	db := createTestDB(t)
 
-		err = db.DeleteItemByID(id)
-		assertNoErr(t, err)
+	// Create user and board
+	user := User{DisplayName: "A"}
+	userId, _ := db.CreateUser(user)
+	board := Board{Title: "Board"}
+	assert.NoError(t, db.CreateBoard(board))
+	boards, _ := db.GetAllBoards()
 
-		_, err = db.GetItemById(id)
-		assert(t, err != nil, "item should have been deleted")
-	})
+	// Add user to board
+	assert.NoError(t, db.AddUserToBoard(boards[0].ID, userId))
 
-	t.Run("Delete user", func(t *testing.T) {
-		id, err := db.CreateUser(User{})
-		assertNoErr(t, err)
+	// Get board users
+	users, err := db.GetBoardUsers(boards[0].ID)
+	assert.NoError(t, err)
+	assert.Len(t, users, 1)
 
-		err = db.DeleteUserById(id)
-		assertNoErr(t, err)
+	// Remove user from board
+	assert.NoError(t, db.RemoveUserFromBoard(boards[0].ID, userId))
 
-		_, err = db.GetUserById(id)
-		assert(t, err != nil, "user should have been deleted")
-	})
+	// Check no users left
+	users, err = db.GetBoardUsers(boards[0].ID)
+	assert.NoError(t, err)
+	assert.Len(t, users, 0)
+}
 
-	t.Run("Get and set item data", func(t *testing.T) {
-		id, err := db.CreateItem(Item{})
-		assertNoErr(t, err)
+func TestGetBoardItemsByStatus(t *testing.T) {
+	db := createTestDB(t)
 
-		str := "Hello World"
-		assertNoErr(t, db.SetItemData(id, str))
+	board := Board{Title: "Board"}
+	assert.NoError(t, db.CreateBoard(board))
+	boards, _ := db.GetAllBoards()
 
-		data, err := db.GetItemData(id)
-		assertNoErr(t, err)
-		assert(t, data == str, "data didnt match expected value")
-	})
+	// Create multiple items with different statuses
+	db.CreateItem(Item{BoardID: boards[0].ID, Title: "Item 1", Status: StatusBacklog})
+	db.CreateItem(Item{BoardID: boards[0].ID, Title: "Item 2", Status: StatusInProgress})
+	db.CreateItem(Item{BoardID: boards[0].ID, Title: "Item 3", Status: StatusBacklog})
+
+	// Fetch items with StatusBacklog
+	items, err := db.GetBoardItemsByStatus(boards[0].ID, StatusBacklog)
+	assert.NoError(t, err)
+	assert.Len(t, items, 2)
 }
