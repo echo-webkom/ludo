@@ -40,7 +40,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 
 		// Get board by id
 		r.Get("/", rest.Handler(func(r rest.Request) int {
-			if board, err := db.GetBoardById(r.ContextValue("id").(uint)); err == nil {
+			if board, err := db.GetBoardById(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondJSON(&board)
 			}
 			return http.StatusInternalServerError
@@ -53,7 +53,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 				return http.StatusBadRequest
 			}
 
-			if err := db.UpdateBoard(board, r.ContextValue("id").(uint)); err != nil {
+			if err := db.UpdateBoard(board, r.ContextValue(idKey).(uint)); err != nil {
 				return http.StatusInternalServerError
 			}
 
@@ -62,7 +62,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 
 		// Delete baord
 		r.Delete("/", rest.Handler(func(r rest.Request) int {
-			if err := db.DeleteBoard(r.ContextValue("id").(uint)); err != nil {
+			if err := db.DeleteBoard(r.ContextValue(idKey).(uint)); err != nil {
 				return http.StatusInternalServerError
 			}
 			return http.StatusOK
@@ -70,7 +70,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 
 		// Get all items in board
 		r.Get("/items", rest.Handler(func(r rest.Request) int {
-			if items, err := db.GetBoardItems(r.ContextValue("id").(uint)); err == nil {
+			if items, err := db.GetBoardItems(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondJSON(&items)
 			}
 			return http.StatusInternalServerError
@@ -83,7 +83,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 				return http.StatusBadRequest
 			}
 
-			items, err := db.GetBoardItemsByStatus(r.ContextValue("id").(uint), database.Status(status))
+			items, err := db.GetBoardItemsByStatus(r.ContextValue(idKey).(uint), database.Status(status))
 			if err != nil {
 				return http.StatusInternalServerError
 			}
@@ -93,7 +93,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 
 		// Get all users in board
 		r.Get("/users", rest.Handler(func(r rest.Request) int {
-			if users, err := db.GetBoardUsers(r.ContextValue("id").(uint)); err == nil {
+			if users, err := db.GetBoardUsers(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondJSON(&users)
 			}
 			return http.StatusInternalServerError
@@ -106,7 +106,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 				return http.StatusBadRequest
 			}
 
-			if err := db.AddUserToBoard(r.ContextValue("id").(uint), uint(userId)); err != nil {
+			if err := db.AddUserToBoard(r.ContextValue(idKey).(uint), uint(userId)); err != nil {
 				return http.StatusInternalServerError
 			}
 
@@ -120,7 +120,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 				return http.StatusBadRequest
 			}
 
-			if err := db.RemoveUserFromBoard(r.ContextValue("id").(uint), uint(userId)); err != nil {
+			if err := db.RemoveUserFromBoard(r.ContextValue(idKey).(uint), uint(userId)); err != nil {
 				return http.StatusInternalServerError
 			}
 

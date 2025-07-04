@@ -6,6 +6,10 @@ import (
 	"strconv"
 )
 
+type ctxId string
+
+const idKey ctxId = "id"
+
 // Require 'id' path value to be integer. Adds to requests context. Responds
 // with bad request and doesnt forward request if id is invalid.
 func idMiddleware(next http.Handler) http.Handler {
@@ -16,7 +20,7 @@ func idMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "id", uint(id))
+		ctx := context.WithValue(r.Context(), idKey, uint(id))
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

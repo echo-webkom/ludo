@@ -39,7 +39,7 @@ func UsersHandler(db *database.Database) chi.Router {
 
 		// Get user by id
 		r.Get("/", rest.Handler(func(r rest.Request) int {
-			if user, err := db.GetUserById(r.ContextValue("id").(uint)); err == nil {
+			if user, err := db.GetUserById(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondJSON(&user)
 			}
 			return http.StatusInternalServerError
@@ -52,7 +52,7 @@ func UsersHandler(db *database.Database) chi.Router {
 				return http.StatusBadRequest
 			}
 
-			if err := db.UpdateUser(user, r.ContextValue("id").(uint)); err != nil {
+			if err := db.UpdateUser(user, r.ContextValue(idKey).(uint)); err != nil {
 				return http.StatusInternalServerError
 			}
 
@@ -61,7 +61,7 @@ func UsersHandler(db *database.Database) chi.Router {
 
 		// Delete user by id
 		r.Delete("/", rest.Handler(func(r rest.Request) int {
-			if err := db.DeleteUserById(r.ContextValue("id").(uint)); err != nil {
+			if err := db.DeleteUserById(r.ContextValue(idKey).(uint)); err != nil {
 				return http.StatusInternalServerError
 			}
 			return http.StatusOK

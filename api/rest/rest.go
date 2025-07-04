@@ -56,6 +56,6 @@ func (r Request) PathUint(name string) (uint, error) {
 	return uint(n), err
 }
 
-func (r Request) ContextValue(name string) any {
-	return r.R.Context().Value(name)
+func (r Request) ContextValue(key any) any {
+	return r.R.Context().Value(key)
 }
