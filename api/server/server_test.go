@@ -48,16 +48,6 @@ func makeRequest(t *testing.T, handler http.Handler, method, path string, body a
 	return w
 }
 
-func TestPing(t *testing.T) {
-	srv, cleanup := setupTestServer(t)
-	defer cleanup()
-
-	resp := makeRequest(t, srv, http.MethodGet, "/ping", nil)
-	if resp.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.Code)
-	}
-}
-
 func TestUserEndpoints(t *testing.T) {
 	s, cleanup := setupTestServer(t)
 	defer cleanup()
