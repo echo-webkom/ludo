@@ -1,12 +1,12 @@
 package server
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/echo-webkom/ludo/api/database"
+	"github.com/echo-webkom/ludo/api/rest"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -16,107 +16,64 @@ func pingHandler() http.HandlerFunc {
 	}
 }
 
-func respondJSON(w http.ResponseWriter, v any) {
-	b, err := json.Marshal(v)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if _, err := w.Write(b); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
-
-func getJSON(r *http.Request, v any) error {
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		return err
-	}
-
-	defer r.Body.Close()
-	return json.Unmarshal(b, v)
-}
-
 func usersHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
 	// Get all users
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		users, err := db.GetAllUsers()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+	r.Get("/", rest.Handler(func(r rest.Request) int {
+		if users, err := db.GetAllUsers(); err == nil {
+			return r.RespondJSON(&users)
 		}
-
-		respondJSON(w, &users)
-	})
+		return http.StatusInternalServerError
+	}))
 
 	// Create user
-	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/", rest.Handler(func(r rest.Request) int {
 		var user database.User
-		if err := getJSON(r, &user); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
-			return
+		if err := r.ParseJSON(&user); err != nil {
+			return http.StatusBadRequest
 		}
 
 		id, err := db.CreateUser(user)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+			return http.StatusInternalServerError
 		}
 
-		respondJSON(w, &database.ID{ID: id})
-	})
+		return r.RespondJSON(&database.ID{ID: id})
+	}))
 
-	// Get user by id
-	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad id", http.StatusBadRequest)
-			return
-		}
+	r.Route("/{id}", func(r chi.Router) {
+		r.Use(idMiddleware)
 
-		user, err := db.GetUserById(uint(id))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// Get user by id
+		r.Get("/", rest.Handler(func(r rest.Request) int {
+			if user, err := db.GetUserById(r.ContextValue("id").(uint)); err == nil {
+				return r.RespondJSON(&user)
+			}
+			return http.StatusInternalServerError
+		}))
 
-		respondJSON(w, &user)
-	})
+		// Update user
+		r.Patch("/", rest.Handler(func(r rest.Request) int {
+			var user database.User
+			if err := r.ParseJSON(&user); err != nil {
+				return http.StatusBadRequest
+			}
 
-	// Update user
-	r.Patch("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		userId, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad user id", http.StatusBadRequest)
-			return
-		}
+			if err := db.UpdateUser(user, r.ContextValue("id").(uint)); err != nil {
+				return http.StatusInternalServerError
+			}
 
-		var user database.User
-		if err := getJSON(r, &user); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
-			return
-		}
+			return http.StatusOK
+		}))
 
-		if err := db.UpdateUser(user, uint(userId)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
-
-	// Delete user by id
-	r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad id", http.StatusBadRequest)
-			return
-		}
-
-		if err := db.DeleteUserById(uint(id)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
+		// Delete user by id
+		r.Delete("/", rest.Handler(func(r rest.Request) int {
+			if err := db.DeleteUserById(r.ContextValue("id").(uint)); err != nil {
+				return http.StatusInternalServerError
+			}
+			return http.StatusOK
+		}))
 	})
 
 	return r
@@ -126,118 +83,83 @@ func itemsHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
 	// Get all items
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		items, err := db.GetAllItems()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+	r.Get("/", rest.Handler(func(r rest.Request) int {
+		if items, err := db.GetAllItems(); err == nil {
+			return r.RespondJSON(&items)
 		}
-
-		respondJSON(w, &items)
-	})
+		return http.StatusInternalServerError
+	}))
 
 	// Create item
-	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/", rest.Handler(func(r rest.Request) int {
 		var item database.Item
-		if err := getJSON(r, &item); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
-			return
+		if err := r.ParseJSON(&item); err != nil {
+			return http.StatusBadRequest
 		}
 
 		id, err := db.CreateItem(item)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+			return http.StatusInternalServerError
 		}
 
-		respondJSON(w, &database.ID{ID: id})
-	})
+		return r.RespondJSON(&database.ID{ID: id})
+	}))
 
-	// Get item by id
-	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad id", http.StatusBadRequest)
-			return
-		}
+	r.Route("/{id}", func(r chi.Router) {
+		r.Use(idMiddleware)
 
-		item, err := db.GetItemById(uint(id))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// Get item by id
+		r.Get("/", rest.Handler(func(r rest.Request) int {
+			if item, err := db.GetItemById(r.ContextValue("id").(uint)); err == nil {
+				return r.RespondJSON(&item)
+			}
+			return http.StatusInternalServerError
+		}))
 
-		respondJSON(w, &item)
-	})
+		// Update item
+		r.Patch("/", rest.Handler(func(r rest.Request) int {
+			var item database.Item
+			if err := r.ParseJSON(&item); err != nil {
+				return http.StatusBadRequest
+			}
 
-	// Update item
-	r.Patch("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		itemId, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad item id", http.StatusBadRequest)
-			return
-		}
+			if err := db.UpdateItem(item, r.ContextValue("id").(uint)); err != nil {
+				return http.StatusInternalServerError
+			}
 
-		var item database.Item
-		if err := getJSON(r, &item); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
-			return
-		}
+			return http.StatusOK
+		}))
 
-		if err := db.UpdateItem(item, uint(itemId)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
+		// Delete item by id
+		r.Delete("/", rest.Handler(func(r rest.Request) int {
+			if err := db.DeleteItemByID(r.ContextValue("id").(uint)); err != nil {
+				return http.StatusInternalServerError
+			}
+			return http.StatusOK
+		}))
 
-	// Delete item by id
-	r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad id", http.StatusBadRequest)
-			return
-		}
+		// Get item data
+		r.Get("/data", rest.Handler(func(r rest.Request) int {
+			if item, err := db.GetItemById(r.ContextValue("id").(uint)); err == nil {
+				return r.RespondString(item.Data)
+			}
+			return http.StatusInternalServerError
+		}))
 
-		if err := db.DeleteItemByID(uint(id)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-	})
+		// Set item data
+		r.Patch("/data", rest.Handler(func(r rest.Request) int {
+			data, err := io.ReadAll(r.R.Body)
+			if err != nil {
+				return http.StatusInternalServerError
+			}
 
-	// Get item data
-	r.Get("/{id}/data", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad id", http.StatusBadRequest)
-			return
-		}
+			id := r.ContextValue("id").(uint)
+			if err := db.SetItemData(id, string(data)); err != nil {
+				return http.StatusInternalServerError
+			}
 
-		item, err := db.GetItemById(uint(id))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Write([]byte(item.Data))
-	})
-
-	// Set item data
-	r.Patch("/{id}/data", func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			http.Error(w, "bad id", http.StatusBadRequest)
-			return
-		}
-
-		data, err := io.ReadAll(r.Body)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if err := db.SetItemData(uint(id), string(data)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+			return http.StatusOK
+		}))
 	})
 
 	return r
@@ -247,168 +169,121 @@ func boardsHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
 	// Get all boards
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		boards, err := db.GetAllBoards()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+	r.Get("/", rest.Handler(func(r rest.Request) int {
+		if boards, err := db.GetAllBoards(); err == nil {
+			return r.RespondJSON(&boards)
 		}
-		respondJSON(w, &boards)
-	})
+		return http.StatusInternalServerError
+	}))
 
 	// Create board
-	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/", rest.Handler(func(r rest.Request) int {
 		var board database.Board
-		if err := getJSON(r, &board); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
-			return
+		if err := r.ParseJSON(&board); err != nil {
+			return http.StatusBadRequest
 		}
 
 		id, err := db.CreateBoard(board)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+			return http.StatusInternalServerError
 		}
 
-		respondJSON(w, &database.ID{ID: id})
-	})
+		return r.RespondJSON(&database.ID{ID: id})
+	}))
 
-	// Get board by id
-	r.Get("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err := strconv.Atoi(r.PathValue("boardId"))
-		if err != nil {
-			http.Error(w, "bad boardId", http.StatusBadRequest)
-			return
-		}
+	r.Route("/{id}", func(r chi.Router) {
+		r.Use(idMiddleware)
 
-		board, err := db.GetBoardById(uint(boardId))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// Get board by id
+		r.Get("/", rest.Handler(func(r rest.Request) int {
+			if board, err := db.GetBoardById(r.ContextValue("id").(uint)); err == nil {
+				return r.RespondJSON(&board)
+			}
+			return http.StatusInternalServerError
+		}))
 
-		respondJSON(w, &board)
-	})
+		// Update board
+		r.Patch("/", rest.Handler(func(r rest.Request) int {
+			var board database.Board
+			if err := r.ParseJSON(&board); err != nil {
+				return http.StatusBadRequest
+			}
 
-	// Update board
-	r.Patch("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err := strconv.Atoi(r.PathValue("boardId"))
-		if err != nil {
-			http.Error(w, "bad boardId", http.StatusBadRequest)
-			return
-		}
+			if err := db.UpdateBoard(board, r.ContextValue("id").(uint)); err != nil {
+				return http.StatusInternalServerError
+			}
 
-		var board database.Board
-		if err := getJSON(r, &board); err != nil {
-			http.Error(w, "bad request data", http.StatusBadRequest)
-			return
-		}
+			return http.StatusOK
+		}))
 
-		if err := db.UpdateBoard(board, uint(boardId)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
+		// Delete baord
+		r.Delete("/", rest.Handler(func(r rest.Request) int {
+			if err := db.DeleteBoard(r.ContextValue("id").(uint)); err != nil {
+				return http.StatusInternalServerError
+			}
+			return http.StatusOK
+		}))
 
-	// Delete baord
-	r.Delete("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err := strconv.Atoi(r.PathValue("boardId"))
-		if err != nil {
-			http.Error(w, "bad boardId", http.StatusBadRequest)
-			return
-		}
+		// Get all items in board
+		r.Get("/items", rest.Handler(func(r rest.Request) int {
+			if items, err := db.GetBoardItems(r.ContextValue("id").(uint)); err == nil {
+				return r.RespondJSON(&items)
+			}
+			return http.StatusInternalServerError
+		}))
 
-		if err := db.DeleteBoard(uint(boardId)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
+		// Get all items with status
+		r.Get("/status/{status}/items", rest.Handler(func(r rest.Request) int {
+			status, err := strconv.Atoi(r.R.PathValue("status"))
+			if err != nil {
+				return http.StatusBadRequest
+			}
 
-	// Get all users in board
-	r.Get("/{boardId}/users", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err := strconv.Atoi(r.PathValue("boardId"))
-		if err != nil {
-			http.Error(w, "bad boardId", http.StatusBadRequest)
-			return
-		}
+			items, err := db.GetBoardItemsByStatus(r.ContextValue("id").(uint), database.Status(status))
+			if err != nil {
+				return http.StatusInternalServerError
+			}
 
-		users, err := db.GetBoardUsers(uint(boardId))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+			return r.RespondJSON(&items)
+		}))
 
-		respondJSON(w, &users)
-	})
+		r.Route("/users", func(r chi.Router) {
+			// Get all users in board
+			r.Get("/", rest.Handler(func(r rest.Request) int {
+				if users, err := db.GetBoardUsers(r.ContextValue("id").(uint)); err == nil {
+					return r.RespondJSON(&users)
+				}
+				return http.StatusInternalServerError
+			}))
 
-	// Get all items in board
-	r.Get("/{boardId}/items", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err := strconv.Atoi(r.PathValue("boardId"))
-		if err != nil {
-			http.Error(w, "bad boardId", http.StatusBadRequest)
-			return
-		}
+			// Add user to board
+			r.Post("/{userId}", rest.Handler(func(r rest.Request) int {
+				userId, err := strconv.Atoi(r.R.PathValue("userId"))
+				if err != nil {
+					return http.StatusBadRequest
+				}
 
-		items, err := db.GetBoardItems(uint(boardId))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+				if err := db.AddUserToBoard(r.ContextValue("id").(uint), uint(userId)); err != nil {
+					return http.StatusInternalServerError
+				}
 
-		respondJSON(w, &items)
-	})
+				return http.StatusOK
+			}))
 
-	// Add user to board
-	r.Post("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err1 := strconv.Atoi(r.PathValue("boardId"))
-		userId, err2 := strconv.Atoi(r.PathValue("userId"))
-		if err1 != nil || err2 != nil {
-			http.Error(w, "bad id(s)", http.StatusBadRequest)
-			return
-		}
+			// Remove user from board
+			r.Delete("/{userId}", rest.Handler(func(r rest.Request) int {
+				userId, err := strconv.Atoi(r.R.PathValue("userId"))
+				if err != nil {
+					return http.StatusBadRequest
+				}
 
-		if err := db.AddUserToBoard(uint(boardId), uint(userId)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
+				if err := db.RemoveUserFromBoard(r.ContextValue("id").(uint), uint(userId)); err != nil {
+					return http.StatusInternalServerError
+				}
 
-	// Remove user from board
-	r.Delete("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err1 := strconv.Atoi(r.PathValue("boardId"))
-		userId, err2 := strconv.Atoi(r.PathValue("userId"))
-		if err1 != nil || err2 != nil {
-			http.Error(w, "bad id(s)", http.StatusBadRequest)
-			return
-		}
-
-		if err := db.RemoveUserFromBoard(uint(boardId), uint(userId)); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	})
-
-	// Get all items with status
-	r.Get("/{boardId}/status/{status}/items", func(w http.ResponseWriter, r *http.Request) {
-		boardId, err := strconv.Atoi(r.PathValue("boardId"))
-		if err != nil {
-			http.Error(w, "bad boardId", http.StatusBadRequest)
-			return
-		}
-
-		status, err := strconv.Atoi(r.PathValue("status"))
-		if err != nil {
-			http.Error(w, "bad status", http.StatusBadRequest)
-			return
-		}
-
-		items, err := db.GetBoardItemsByStatus(uint(boardId), database.Status(status))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		respondJSON(w, &items)
+				return http.StatusOK
+			}))
+		})
 	})
 
 	return r
