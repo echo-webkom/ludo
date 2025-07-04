@@ -7,6 +7,7 @@ import (
 
 	"github.com/echo-webkom/ludo/api/config"
 	"github.com/echo-webkom/ludo/api/database"
+	"github.com/echo-webkom/ludo/api/server/routes"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jesperkha/notifier"
@@ -21,11 +22,9 @@ func New(config *config.Config, db *database.Database) *Server {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	r.Get("/ping", pingHandler())
-
-	r.Mount("/users", usersHandler(db))
-	r.Mount("/items", itemsHandler(db))
-	r.Mount("/boards", boardsHandler(db))
+	r.Mount("/users", routes.UsersHandler(db))
+	r.Mount("/items", routes.ItemsHandler(db))
+	r.Mount("/boards", routes.BoardsHandler(db))
 
 	return &Server{
 		router: r,
