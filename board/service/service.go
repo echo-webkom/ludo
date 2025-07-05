@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/board/config"
+	"github.com/echo-webkom/ludo/pkg/model"
 )
 
 type LudoService struct {
@@ -65,23 +65,23 @@ func (l *LudoService) request(method, endpoint string, body, response any) error
 	return err
 }
 
-func (l *LudoService) GetAllUsers() (users []database.User, err error) {
+func (l *LudoService) GetAllUsers() (users []model.User, err error) {
 	err = l.request("GET", "/users", nil, &users)
 	return users, err
 }
 
-func (l *LudoService) CreateUser(user database.User) (id uint, err error) {
-	var idRes database.ID
+func (l *LudoService) CreateUser(user model.User) (id uint, err error) {
+	var idRes model.ID
 	err = l.request("POST", "/users", &user, &idRes)
 	return idRes.ID, err
 }
 
-func (l *LudoService) GetUserById(id uint) (user database.User, err error) {
+func (l *LudoService) GetUserById(id uint) (user model.User, err error) {
 	err = l.request("GET", fmt.Sprintf("/users/%d", id), nil, &user)
 	return user, err
 }
 
-func (l *LudoService) UpdateUser(id uint, user database.User) error {
+func (l *LudoService) UpdateUser(id uint, user model.User) error {
 	return l.request("PATCH", fmt.Sprintf("/users/%d", id), &user, nil)
 }
 
@@ -89,23 +89,23 @@ func (l *LudoService) DeleteUser(id uint) error {
 	return l.request("DELETE", fmt.Sprintf("/users/%d", id), nil, nil)
 }
 
-func (l *LudoService) GetAllBoards() (boards []database.Board, err error) {
+func (l *LudoService) GetAllBoards() (boards []model.Board, err error) {
 	err = l.request("GET", "/boards", nil, &boards)
 	return boards, err
 }
 
-func (l *LudoService) CreateBoard(board database.Board) (id uint, err error) {
-	var idRes database.ID
+func (l *LudoService) CreateBoard(board model.Board) (id uint, err error) {
+	var idRes model.ID
 	err = l.request("POST", "/boards", &board, &idRes)
 	return idRes.ID, err
 }
 
-func (l *LudoService) GetBoardById(id uint) (board database.Board, err error) {
+func (l *LudoService) GetBoardById(id uint) (board model.Board, err error) {
 	err = l.request("GET", fmt.Sprintf("/boards/%d", id), nil, &board)
 	return board, err
 }
 
-func (l *LudoService) UpdateBoard(id uint, board database.Board) error {
+func (l *LudoService) UpdateBoard(id uint, board model.Board) error {
 	return l.request("PATCH", fmt.Sprintf("/boards/%d", id), &board, nil)
 }
 
@@ -113,12 +113,12 @@ func (l *LudoService) DeleteBoard(id uint) error {
 	return l.request("DELETE", fmt.Sprintf("/boards/%d", id), nil, nil)
 }
 
-func (l *LudoService) GetAllUsersInBoard(id uint) (users []database.User, err error) {
+func (l *LudoService) GetAllUsersInBoard(id uint) (users []model.User, err error) {
 	err = l.request("GET", fmt.Sprintf("/boards/%d/users", id), nil, &users)
 	return users, err
 }
 
-func (l *LudoService) GetAllItemsInBoard(id uint) (items []database.Item, err error) {
+func (l *LudoService) GetAllItemsInBoard(id uint) (items []model.Item, err error) {
 	err = l.request("GET", fmt.Sprintf("/boards/%d/items", id), nil, &items)
 	return items, err
 }
@@ -131,28 +131,28 @@ func (l *LudoService) RemoveUserFromBoard(boardId, userId uint) error {
 	return l.request("DELETE", fmt.Sprintf("/boards/%d/users/%d", boardId, userId), nil, nil)
 }
 
-func (l *LudoService) GetAllItemsInBoardList(boardId, list uint) (items []database.Item, err error) {
+func (l *LudoService) GetAllItemsInBoardList(boardId, list uint) (items []model.Item, err error) {
 	err = l.request("GET", fmt.Sprintf("/boards/%d/lists/%d/items", boardId, list), nil, &items)
 	return items, err
 }
 
-func (l *LudoService) GetAllItems() (items []database.Item, err error) {
+func (l *LudoService) GetAllItems() (items []model.Item, err error) {
 	err = l.request("GET", "/items", nil, &items)
 	return items, err
 }
 
-func (l *LudoService) CreateItem(item database.Item) (id uint, err error) {
-	var idRes database.ID
+func (l *LudoService) CreateItem(item model.Item) (id uint, err error) {
+	var idRes model.ID
 	err = l.request("POST", "/items", &item, &idRes)
 	return idRes.ID, err
 }
 
-func (l *LudoService) GetItemById(id uint) (item database.Item, err error) {
+func (l *LudoService) GetItemById(id uint) (item model.Item, err error) {
 	err = l.request("GET", fmt.Sprintf("/items/%d", id), nil, &item)
 	return item, err
 }
 
-func (l *LudoService) UpdateItem(id uint, item database.Item) error {
+func (l *LudoService) UpdateItem(id uint, item model.Item) error {
 	return l.request("PATCH", fmt.Sprintf("/items/%d", id), &item, nil)
 }
 

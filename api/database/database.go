@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/echo-webkom/ludo/pkg/model"
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	"gorm.io/driver/sqlite"
@@ -16,7 +17,7 @@ type Database struct {
 }
 
 func newDatabase(db *gorm.DB) *Database {
-	if err := db.AutoMigrate(&Board{}, &Item{}, &User{}); err != nil {
+	if err := db.AutoMigrate(&model.Board{}, &model.Item{}, &model.User{}); err != nil {
 		log.Fatalf("migration: %v", err)
 	}
 	return &Database{db}

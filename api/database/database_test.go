@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/echo-webkom/ludo/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +19,7 @@ func createTestDB(t *testing.T) *Database {
 	})
 
 	// Auto migrate schema
-	err = db.db.AutoMigrate(&Board{}, &Item{}, &User{})
+	err = db.db.AutoMigrate(&model.Board{}, &model.Item{}, &model.User{})
 	assert.NoError(t, err)
 
 	return db
@@ -28,7 +29,7 @@ func TestUserMethods(t *testing.T) {
 	db := createTestDB(t)
 
 	// Create user
-	user := User{DisplayName: "Test User", GithubUsername: "testuser"}
+	user := model.User{DisplayName: "Test User", GithubUsername: "testuser"}
 	id, err := db.CreateUser(user)
 	assert.NoError(t, err)
 
@@ -55,7 +56,7 @@ func TestBoardMethods(t *testing.T) {
 	db := createTestDB(t)
 
 	// Create board
-	board := Board{Title: "Board 1", RepoURL: "https://github.com/example/repo"}
+	board := model.Board{Title: "Board 1", RepoURL: "https://github.com/example/repo"}
 	_, err := db.CreateBoard(board)
 	assert.NoError(t, err)
 
@@ -88,13 +89,13 @@ func TestItemMethods(t *testing.T) {
 	db := createTestDB(t)
 
 	// Create board
-	board := Board{Title: "Board", RepoURL: "url"}
+	board := model.Board{Title: "Board", RepoURL: "url"}
 	_, err := db.CreateBoard(board)
 	assert.NoError(t, err)
 	boards, _ := db.GetAllBoards()
 
 	// Create item
-	item := Item{BoardID: boards[0].ID, Title: "Item 1", Status: StatusBacklog}
+	item := model.Item{BoardID: boards[0].ID, Title: "Item 1", Status: model.StatusBacklog}
 	itemID, err := db.CreateItem(item)
 	assert.NoError(t, err)
 
@@ -104,11 +105,11 @@ func TestItemMethods(t *testing.T) {
 	assert.Equal(t, "Item 1", got.Title)
 
 	// Change status
-	err = db.ChangeItemStatus(itemID, StatusInProgress)
+	err = db.ChangeItemStatus(itemID, model.StatusInProgress)
 	assert.NoError(t, err)
 
 	// Get items with status
-	items, err := db.GetAllItemsWithStatus(boards[0].ID, StatusInProgress)
+	items, err := db.GetAllItemsWithStatus(boards[0].ID, model.StatusInProgress)
 	assert.NoError(t, err)
 	assert.Len(t, items, 1)
 
@@ -128,9 +129,9 @@ func TestBoardUsers(t *testing.T) {
 	db := createTestDB(t)
 
 	// Create user and board
-	user := User{DisplayName: "A"}
+	user := model.User{DisplayName: "A"}
 	userId, _ := db.CreateUser(user)
-	board := Board{Title: "Board"}
+	board := model.Board{Title: "Board"}
 
 	_, err := db.CreateBoard(board)
 	assert.NoError(t, err)
@@ -157,19 +158,19 @@ func TestBoardUsers(t *testing.T) {
 func TestGetBoardItemsByStatus(t *testing.T) {
 	db := createTestDB(t)
 
-	board := Board{Title: "Board"}
+	board := model.Board{Title: "Board"}
 	_, err := db.CreateBoard(board)
 	assert.NoError(t, err)
 
 	boards, _ := db.GetAllBoards()
 
 	// Create multiple items with different statuses
-	db.CreateItem(Item{BoardID: boards[0].ID, Title: "Item 1", Status: StatusBacklog})
-	db.CreateItem(Item{BoardID: boards[0].ID, Title: "Item 2", Status: StatusInProgress})
-	db.CreateItem(Item{BoardID: boards[0].ID, Title: "Item 3", Status: StatusBacklog})
+	db.CreateItem(model.Item{BoardID: boards[0].ID, Title: "Item 1", Status: model.StatusBacklog})
+	db.CreateItem(model.Item{BoardID: boards[0].ID, Title: "Item 2", Status: model.StatusInProgress})
+	db.CreateItem(model.Item{BoardID: boards[0].ID, Title: "Item 3", Status: model.StatusBacklog})
 
 	// Fetch items with StatusBacklog
-	items, err := db.GetBoardItemsByStatus(boards[0].ID, StatusBacklog)
+	items, err := db.GetBoardItemsByStatus(boards[0].ID, model.StatusBacklog)
 	assert.NoError(t, err)
 	assert.Len(t, items, 2)
 }

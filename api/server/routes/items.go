@@ -6,6 +6,7 @@ import (
 
 	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/rest"
+	"github.com/echo-webkom/ludo/pkg/model"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -22,7 +23,7 @@ func ItemsHandler(db *database.Database) chi.Router {
 
 	// Create item
 	r.Post("/", rest.Handler(func(r rest.Request) int {
-		var item database.Item
+		var item model.Item
 		if err := r.ParseJSON(&item); err != nil {
 			return http.StatusBadRequest
 		}
@@ -32,7 +33,7 @@ func ItemsHandler(db *database.Database) chi.Router {
 			return http.StatusInternalServerError
 		}
 
-		return r.RespondJSON(&database.ID{ID: id})
+		return r.RespondJSON(&model.ID{ID: id})
 	}))
 
 	r.Route("/{id}", func(r chi.Router) {
@@ -48,7 +49,7 @@ func ItemsHandler(db *database.Database) chi.Router {
 
 		// Update item
 		r.Patch("/", rest.Handler(func(r rest.Request) int {
-			var item database.Item
+			var item model.Item
 			if err := r.ParseJSON(&item); err != nil {
 				return http.StatusBadRequest
 			}

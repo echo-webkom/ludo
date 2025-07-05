@@ -13,6 +13,7 @@ import (
 	"github.com/echo-webkom/ludo/api/config"
 	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/server"
+	"github.com/echo-webkom/ludo/pkg/model"
 )
 
 func setupTestServer(t *testing.T) (*server.Server, func()) {
@@ -53,12 +54,12 @@ func TestUserEndpoints(t *testing.T) {
 	defer cleanup()
 
 	// Create user
-	user := database.User{DisplayName: "Test User"}
+	user := model.User{DisplayName: "Test User"}
 	resp := makeRequest(t, s, http.MethodPost, "/users", &user)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("CreateUser failed, code %d", resp.Code)
 	}
-	var created database.ID
+	var created model.ID
 	json.NewDecoder(resp.Body).Decode(&created)
 
 	// Get user
@@ -85,12 +86,12 @@ func TestItemEndpoints(t *testing.T) {
 	defer cleanup()
 
 	// Create item
-	item := database.Item{Data: "Test Data"}
+	item := model.Item{Data: "Test Data"}
 	resp := makeRequest(t, s, http.MethodPost, "/items", &item)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("CreateItem failed, code %d", resp.Code)
 	}
-	var created database.ID
+	var created model.ID
 	json.NewDecoder(resp.Body).Decode(&created)
 
 	// Get item
@@ -129,12 +130,12 @@ func TestBoardEndpoints(t *testing.T) {
 	defer cleanup()
 
 	// Create board
-	board := database.Board{Title: "Test Board"}
+	board := model.Board{Title: "Test Board"}
 	resp := makeRequest(t, s, http.MethodPost, "/boards", &board)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("CreateBoard failed, code %d", resp.Code)
 	}
-	var createdBoard database.ID
+	var createdBoard model.ID
 	json.NewDecoder(resp.Body).Decode(&createdBoard)
 
 	// Get board
@@ -150,12 +151,12 @@ func TestBoardEndpoints(t *testing.T) {
 	}
 
 	// Add user to board (assuming user creation tested before)
-	user := database.User{DisplayName: "Board User"}
+	user := model.User{DisplayName: "Board User"}
 	resp = makeRequest(t, s, http.MethodPost, "/users", &user)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("CreateUser failed, code %d", resp.Code)
 	}
-	var userID database.ID
+	var userID model.ID
 	json.NewDecoder(resp.Body).Decode(&userID)
 
 	resp = makeRequest(t, s, http.MethodPost, "/boards/"+strconv.Itoa(int(createdBoard.ID))+"/users/"+strconv.Itoa(int(userID.ID)), nil)

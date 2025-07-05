@@ -6,6 +6,7 @@ import (
 
 	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/rest"
+	"github.com/echo-webkom/ludo/pkg/model"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -22,7 +23,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 
 	// Create board
 	r.Post("/", rest.Handler(func(r rest.Request) int {
-		var board database.Board
+		var board model.Board
 		if err := r.ParseJSON(&board); err != nil {
 			return http.StatusBadRequest
 		}
@@ -32,7 +33,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 			return http.StatusInternalServerError
 		}
 
-		return r.RespondJSON(&database.ID{ID: id})
+		return r.RespondJSON(&model.ID{ID: id})
 	}))
 
 	r.Route("/{id}", func(r chi.Router) {
@@ -48,7 +49,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 
 		// Update board
 		r.Patch("/", rest.Handler(func(r rest.Request) int {
-			var board database.Board
+			var board model.Board
 			if err := r.ParseJSON(&board); err != nil {
 				return http.StatusBadRequest
 			}
@@ -83,7 +84,7 @@ func BoardsHandler(db *database.Database) chi.Router {
 				return http.StatusBadRequest
 			}
 
-			items, err := db.GetBoardItemsByStatus(r.ContextValue(idKey).(uint), database.Status(status))
+			items, err := db.GetBoardItemsByStatus(r.ContextValue(idKey).(uint), model.Status(status))
 			if err != nil {
 				return http.StatusInternalServerError
 			}
