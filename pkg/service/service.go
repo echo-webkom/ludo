@@ -3,76 +3,50 @@ package service
 import "github.com/echo-webkom/ludo/pkg/model"
 
 type LudoService interface {
-	// Get the board service.
-	Boards() Boards
-	// Get the user service.
-	Users() Users
-}
-
-type Users interface {
-	// Get all users.
-	All() ([]model.User, error)
-	// Create a new user. Returns the ID.
-	New(user model.User) (uint, error)
-	// Get a user by ID.
-	Id(id uint) User
-}
-
-type User interface {
-	// Get the user data.
-	Get() (model.User, error)
-	// Update the user. Replaces all fields with those given.
-	Update(user model.User) error
-	// Delete the user and remove it from all boards.
-	Delete() error
-}
-
-type Boards interface {
-	// Get all boards.
-	All() ([]model.Board, error)
-	// Create a new board. Returns the ID.
-	New(board model.Board) (uint, error)
 	// Get a board by ID.
-	Id(id uint) Board
-}
-
-type Board interface {
-	// Get board data.
-	Get() (model.Board, error)
+	GetBoard(id uint) (model.Board, error)
 	// Update the board. Replaces all fields with those given.
-	Update(board model.Board) error
+	UpdateBoard(board model.Board) error
 	// Delete the board and all its items.
-	Delete() error
-	// Get the items service for this board.
-	Items() Items
-	// Get all users assigned to this board.
-	Users() ([]model.User, error)
-	// Add an existing user to this board.
-	AddUser(userId uint) error
-	// Remove a user from this board.
-	RemoveUser(userId uint) error
-}
+	DeleteBoard(id uint) error
+	// Create a new board. Returns the ID.
+	NewBoard(board model.Board) (uint, error)
+	// Get all boards.
+	GetAllBoards() ([]model.Board, error)
 
-type Items interface {
-	// Get all items in this board.
-	All() ([]model.Item, error)
-	// Create new item in this board.
-	New(item model.Item) (uint, error)
-	// Get all items with a given status in this board.
-	WithStatus(list uint) ([]model.Item, error)
-	// Get an item by ID.
-	Id(id uint) Item
-}
+	// Get a user by ID.
+	GetUser(id uint) (model.User, error)
+	// Update the user. Replaces all fields with those given.
+	UpdateUser(user model.User) error
+	// Delete the user and remove it from all boards.
+	DeleteUser(id uint) error
+	// Create a new user. Returns the ID.
+	NewUser(user model.User) (uint, error)
+	// Get all users.
+	GetAllUsers() ([]model.User, error)
 
-type Item interface {
-	// Get item data.
-	Get() (model.Item, error)
-	// Update this item. Replaces all fields with those given.
-	Update(item model.Item) error
-	// Delete this item.
-	Delete() error
-	// Get this items data segment.
-	Data() (string, error)
-	// Set this items data segment.
-	SetData(data string) error
+	// Get all users assigned to a board.
+	GetBoardUsers(boardID uint) ([]model.User, error)
+	// Add an existing user to a board.
+	AddUserToBoard(boardID uint, userID uint) error
+	// Remove a user from a board.
+	RemoveUserFromBoard(boardID uint, userID uint) error
+
+	// Get an item in a board by ID.
+	GetItem(boardID uint, itemID uint) (model.Item, error)
+	// Update an item. Replaces all fields with those given.
+	UpdateItem(boardID uint, item model.Item) error
+	// Delete an item.
+	DeleteItem(boardID uint, itemID uint) error
+	// Create a new item in a board. Returns the ID.
+	NewItem(boardID uint, item model.Item) (uint, error)
+	// Get all items in a board.
+	GetBoardItems(boardID uint) ([]model.Item, error)
+	// Get all items in a board with a given status.
+	GetBoardItemsWithStatus(boardID uint, status model.Status) ([]model.Item, error)
+
+	// Get this item's data segment.
+	GetItemData(boardID uint, itemID uint) (string, error)
+	// Set this item's data segment.
+	SetItemData(boardID uint, itemID uint, data string) error
 }
