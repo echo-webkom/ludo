@@ -21,6 +21,7 @@ func JSON(w http.ResponseWriter, data any) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)
 }
 
@@ -107,6 +108,8 @@ func usersRouter(db database.Database) *chi.Mux {
 			http.Error(w, "not valid user id", http.StatusNotFound)
 			return
 		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	router.Patch("/{userId}", func(w http.ResponseWriter, r *http.Request) {
@@ -132,6 +135,7 @@ func usersRouter(db database.Database) *chi.Mux {
 			return
 		}
 
+		w.WriteHeader(http.StatusNoContent)
 	})
 	return router
 }
@@ -151,7 +155,7 @@ func itemRouter(db database.Database) *chi.Mux {
 		b, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
-			http.Error(w, "invalid item data", http.StatusBadGateway)
+			http.Error(w, "failed to read body", http.StatusInternalServerError)
 			return
 		}
 
@@ -174,17 +178,16 @@ func itemRouter(db database.Database) *chi.Mux {
 	router.Get("/{itemId}", func(w http.ResponseWriter, r *http.Request) {
 		itemIdString := r.PathValue("itemId")
 		itemId := getId(w, itemIdString)
+		if itemId == 0 {
+			return 
+		}
 
 		item, err := db.GetItemById(uint(itemId))
 		if err != nil {
-			http.Error(w, "could not find item", http.StatusBadRequest)
+			http.Error(w, "could not find item", http.StatusNotFound)
 			return
 		}
 		JSON(w, item)
-	})
-
-	router.Patch("/{itemId}", func(w http.ResponseWriter, r *http.Request) {
-
 	})
 
 	router.Delete("/{itemId}", func(w http.ResponseWriter, r *http.Request) {
@@ -192,9 +195,11 @@ func itemRouter(db database.Database) *chi.Mux {
 		itemId := getId(w, itemIdString)
 
 		if err := db.DeleteItemByID(uint(itemId)); err != nil {
-			http.Error(w, "could not delet item", http.StatusBadRequest)
+			http.Error(w, "could not delete item", http.StatusNotFound)
 			return
 		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	router.Patch("/{itemId}", func(w http.ResponseWriter, r *http.Request) {
@@ -204,17 +209,22 @@ func itemRouter(db database.Database) *chi.Mux {
 		b, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
-			http.Error(w, "could not find user", http.StatusInternalServerError)
+			http.Error(w, "failed to read body", http.StatusInternalServerError)
+			return
 		}
 
 		var item database.Item
 		if err := json.Unmarshal(b, &item); err != nil {
 			http.Error(w, "invalid item data", http.StatusBadRequest)
+			return
 		}
 
 		if err := db.UpdateItem(itemId, item); err != nil {
 			http.Error(w, "could not update item", http.StatusInternalServerError)
+			return
 		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	router.Patch("/{itemId}/move/{listId}", func(w http.ResponseWriter, r *http.Request) {
@@ -226,7 +236,10 @@ func itemRouter(db database.Database) *chi.Mux {
 
 		if err := db.MoveItemToList(itemId, listId); err != nil {
 			http.Error(w, "could not move item to list", http.StatusInternalServerError)
+			return
 		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	return router
@@ -239,10 +252,10 @@ func boardsRouter(db database.Database) *chi.Mux {
 		boards, err := db.GetAllBoards()
 		if err != nil {
 			http.Error(w, "failed to get all boards", http.StatusNotFound)
+			return
 		}
 
 		JSON(w, boards)
-
 	})
 
 	router.Post("/", func(w http.ResponseWriter, r *http.Request) {
@@ -256,10 +269,9 @@ func boardsRouter(db database.Database) *chi.Mux {
 		
 		var board database.Board
 		if err := json.Unmarshal(b, &board); err != nil {
-			http.Error(w, "invalid user data", http.StatusBadRequest)
+			http.Error(w, "invalid board data", http.StatusBadRequest)
 			return
 		}
-
 
 		id, err := db.CreateBoard(board)
 		if err != nil {
@@ -269,16 +281,16 @@ func boardsRouter(db database.Database) *chi.Mux {
 
 		res := ResponseId{id}
 		JSON(w, res)
-
 	})
 
 	router.Get("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
 		boardIdString := r.PathValue("boardId")
-		boardId := getId(w, boardIdString)	
+		boardId := getId(w, boardIdString)
 
 		board, err := db.GetBoardById(boardId)
 		if err != nil {
 			http.Error(w, "failed to get board by id", http.StatusNotFound)
+			return
 		}
 
 		JSON(w, board)
@@ -288,51 +300,120 @@ func boardsRouter(db database.Database) *chi.Mux {
 		boardIdString := r.PathValue("boardId")
 		boardId := getId(w, boardIdString)
 
-
 		b, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 		if err != nil {
-			http.Error(w, "could not find user", http.StatusInternalServerError)
+			http.Error(w, "failed to read body", http.StatusInternalServerError)
+			return
 		}
 
 		var board database.Board
 		if err := json.Unmarshal(b, &board); err != nil {
-			http.Error(w, "invalid item data", http.StatusBadRequest)
+			http.Error(w, "invalid board data", http.StatusBadRequest)
+			return
 		}
 
 		if err := db.UpdateBoard(boardId, board); err != nil {
-			http.Error(w, "could not update user", http.StatusInternalServerError)
+			http.Error(w, "could not update board", http.StatusInternalServerError)
+			return
 		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	router.Delete("/{boardId}", func(w http.ResponseWriter, r *http.Request) {
-
 		boardIdString := r.PathValue("boardId")
 		boardId := getId(w, boardIdString)
 
 		if err := db.DeleteBoardById(boardId); err != nil {
-			http.Error(w, "could not delete", http.StatusBadRequest)
+			http.Error(w, "could not delete board", http.StatusNotFound)
+			return
 		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
-	router.Get("{boardId}/users", func(w http.ResponseWriter, r *http.Request) {
-		
+	router.Get("/{boardId}/users", func(w http.ResponseWriter, r *http.Request) {
+		boardIdString := r.PathValue("boardId")
+		boardId := getId(w, boardIdString)
+
+
+		users, err := db.GetBoardUsers(boardId)
+		if err != nil {
+			http.Error(w, "could not get board users", http.StatusNotFound)
+			return
+		}
+
+		JSON(w, users)
 	})
+
 
 	router.Get("/{boardId}/items", func(w http.ResponseWriter, r *http.Request) {
+		boardIdString := r.PathValue("boardId")
+		boardId := getId(w, boardIdString)
 
+
+		items, err := db.GetBoardItems(boardId)
+		if err != nil {
+			http.Error(w, "could not get board items", http.StatusNotFound)
+			return
+		}
+
+		JSON(w, items)
 	})
 
-	router.Get("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
 
+	router.Post("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
+		boardIdString := r.PathValue("boardId")
+		userIdString := r.PathValue("userId")
+		
+		boardId := getId(w, boardIdString)
+		
+		userId := getId(w, userIdString)
+
+		if err := db.AddUserToBoard(boardId, userId); err != nil {
+			http.Error(w, "could not add user to board", http.StatusInternalServerError)
+			return
+		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	router.Delete("/{boardId}/users/{userId}", func(w http.ResponseWriter, r *http.Request) {
+		boardIdString := r.PathValue("boardId")
+		userIdString := r.PathValue("userId")
+		
+		boardId := getId(w, boardIdString)
+		
+		userId := getId(w, userIdString)
 
+		if err := db.RemoveUserFromBoard(boardId, userId); err != nil {
+			http.Error(w, "could not remove user from board", http.StatusInternalServerError)
+			return
+		}
+		
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	router.Get("/{boardId}/lists/{listId}/items", func(w http.ResponseWriter, r *http.Request) {
+		boardIdString := r.PathValue("boardId")
+		listIdString := r.PathValue("listId")
+		
+		boardId := getId(w, boardIdString)
 
+		
+		listId := getId(w, listIdString)
+		if listId == 0 {
+			return
+		}
+
+		items, err := db.GetAllItemsFromList(boardId, listId)
+		if err != nil {
+			http.Error(w, "could not get items from list", http.StatusNotFound)
+			return
+		}
+
+		JSON(w, items)
 	})
 
 	return router
