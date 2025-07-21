@@ -11,9 +11,9 @@ import (
 	"testing"
 
 	"github.com/echo-webkom/ludo/api/config"
-	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/server"
 	"github.com/echo-webkom/ludo/pkg/model"
+	"github.com/echo-webkom/ludo/pkg/service"
 )
 
 func setupTestServer(t *testing.T) (*server.Server, func()) {
@@ -21,7 +21,7 @@ func setupTestServer(t *testing.T) (*server.Server, func()) {
 	if err != nil {
 		t.Fatalf("failed to create temp file: %v", err)
 	}
-	db := database.NewSQLite(tempFile.Name())
+	db := service.NewSQLiteService(tempFile.Name())
 
 	cfg := &config.Config{Port: ":8080"}
 	srv := server.New(cfg, db)

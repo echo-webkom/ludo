@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/echo-webkom/ludo/api/config"
-	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/server/routes"
+	"github.com/echo-webkom/ludo/pkg/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jesperkha/notifier"
@@ -18,13 +18,13 @@ type Server struct {
 	router http.Handler
 }
 
-func New(config *config.Config, db *database.Database) *Server {
+func New(config *config.Config, service service.LudoService) *Server {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	r.Mount("/users", routes.UsersHandler(db))
-	r.Mount("/items", routes.ItemsHandler(db))
-	r.Mount("/boards", routes.BoardsHandler(db))
+	r.Mount("/users", routes.UsersHandler(service))
+	r.Mount("/items", routes.ItemsHandler(service))
+	r.Mount("/boards", routes.BoardsHandler(service))
 
 	return &Server{
 		router: r,

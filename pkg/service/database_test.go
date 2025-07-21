@@ -1,4 +1,4 @@
-package database
+package service
 
 import (
 	"os"
@@ -12,7 +12,7 @@ func createTestDB(t *testing.T) *Database {
 	tmpfile, err := os.CreateTemp("", "testdb-*.sqlite")
 	assert.NoError(t, err)
 
-	db := NewSQLite(tmpfile.Name())
+	db := NewSQLiteService(tmpfile.Name())
 
 	t.Cleanup(func() {
 		os.Remove(tmpfile.Name())
