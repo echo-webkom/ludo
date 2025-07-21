@@ -4,43 +4,21 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/rest"
+	"github.com/echo-webkom/ludo/pkg/model"
+	"github.com/echo-webkom/ludo/pkg/service"
 	"github.com/go-chi/chi/v5"
 )
 
-func ItemsHandler(db *database.Database) chi.Router {
+func ItemsHandler(s service.LudoService) chi.Router {
 	r := chi.NewRouter()
-
-	// Get all items
-	r.Get("/", rest.Handler(func(r rest.Request) int {
-		if items, err := db.GetAllItems(); err == nil {
-			return r.RespondJSON(&items)
-		}
-		return http.StatusInternalServerError
-	}))
-
-	// Create item
-	r.Post("/", rest.Handler(func(r rest.Request) int {
-		var item database.Item
-		if err := r.ParseJSON(&item); err != nil {
-			return http.StatusBadRequest
-		}
-
-		id, err := db.CreateItem(item)
-		if err != nil {
-			return http.StatusInternalServerError
-		}
-
-		return r.RespondJSON(&database.ID{ID: id})
-	}))
 
 	r.Route("/{id}", func(r chi.Router) {
 		r.Use(idMiddleware)
 
 		// Get item by id
 		r.Get("/", rest.Handler(func(r rest.Request) int {
-			if item, err := db.GetItemById(r.ContextValue(idKey).(uint)); err == nil {
+			if item, err := s.Item(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondJSON(&item)
 			}
 			return http.StatusInternalServerError
@@ -48,12 +26,12 @@ func ItemsHandler(db *database.Database) chi.Router {
 
 		// Update item
 		r.Patch("/", rest.Handler(func(r rest.Request) int {
-			var item database.Item
+			var item model.Item
 			if err := r.ParseJSON(&item); err != nil {
 				return http.StatusBadRequest
 			}
 
-			if err := db.UpdateItem(item, r.ContextValue(idKey).(uint)); err != nil {
+			if err := s.UpdateItem(r.ContextValue(idKey).(uint), item); err != nil {
 				return http.StatusInternalServerError
 			}
 
@@ -62,7 +40,7 @@ func ItemsHandler(db *database.Database) chi.Router {
 
 		// Delete item by id
 		r.Delete("/", rest.Handler(func(r rest.Request) int {
-			if err := db.DeleteItemByID(r.ContextValue(idKey).(uint)); err != nil {
+			if err := s.DeleteItem(r.ContextValue(idKey).(uint)); err != nil {
 				return http.StatusInternalServerError
 			}
 			return http.StatusOK
@@ -70,7 +48,7 @@ func ItemsHandler(db *database.Database) chi.Router {
 
 		// Get item data
 		r.Get("/data", rest.Handler(func(r rest.Request) int {
-			if item, err := db.GetItemById(r.ContextValue(idKey).(uint)); err == nil {
+			if item, err := s.Item(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondString(item.Data)
 			}
 			return http.StatusInternalServerError
@@ -84,7 +62,7 @@ func ItemsHandler(db *database.Database) chi.Router {
 			}
 
 			id := r.ContextValue(idKey).(uint)
-			if err := db.SetItemData(id, string(data)); err != nil {
+			if err := s.SetItemData(id, string(data)); err != nil {
 				return http.StatusInternalServerError
 			}
 

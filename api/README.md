@@ -29,6 +29,7 @@ Boards are containers for items and have users assosiated with them. A board may
 | DELETE | `/boards/{boardId}`                       | -             | Delete a board                             |
 | GET    | `/boards/{boardId}/users`                 | `[]User`      | Get all users in board                     |
 | GET    | `/boards/{boardId}/items`                 | `[]Item`      | Get all items in board                     |
+| POST   | `/boards/{boardId}/items`                 | `ID`          | Create a new item in board                 |
 | POST   | `/boards/{boardId}/users/{userId}`        | -             | Add user to board                          |
 | DELETE | `/boards/{boardId}/users/{userId}`        | -             | Remove user from board                     |
 | GET    | `/boards/{boardId}/status/{status}/items` | `[]Item`      | Get all items in board with given `Status` |
@@ -37,8 +38,6 @@ Boards are containers for items and have users assosiated with them. A board may
 
 | Method | Path                   | Response Type | Description             |
 | ------ | ---------------------- | ------------- | ----------------------- |
-| GET    | `/items`               | `[]Item`      | Get all items           |
-| POST   | `/items`               | `ID`          | Create an item          |
 | GET    | `/items/{itemId}`      | `Item`        | Get item by ID          |
 | PATCH  | `/items/{itemId}`      | -             | Update an existing item |
 | DELETE | `/items/{itemId}`      | -             | Delete an item          |

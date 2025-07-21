@@ -3,17 +3,18 @@ package routes
 import (
 	"net/http"
 
-	"github.com/echo-webkom/ludo/api/database"
 	"github.com/echo-webkom/ludo/api/rest"
+	"github.com/echo-webkom/ludo/pkg/model"
+	"github.com/echo-webkom/ludo/pkg/service"
 	"github.com/go-chi/chi/v5"
 )
 
-func UsersHandler(db *database.Database) chi.Router {
+func UsersHandler(s service.LudoService) chi.Router {
 	r := chi.NewRouter()
 
 	// Get all users
 	r.Get("/", rest.Handler(func(r rest.Request) int {
-		if users, err := db.GetAllUsers(); err == nil {
+		if users, err := s.Users(); err == nil {
 			return r.RespondJSON(&users)
 		}
 		return http.StatusInternalServerError
@@ -21,17 +22,17 @@ func UsersHandler(db *database.Database) chi.Router {
 
 	// Create user
 	r.Post("/", rest.Handler(func(r rest.Request) int {
-		var user database.User
+		var user model.User
 		if err := r.ParseJSON(&user); err != nil {
 			return http.StatusBadRequest
 		}
 
-		id, err := db.CreateUser(user)
+		id, err := s.NewUser(user)
 		if err != nil {
 			return http.StatusInternalServerError
 		}
 
-		return r.RespondJSON(&database.ID{ID: id})
+		return r.RespondJSON(&model.ID{ID: id})
 	}))
 
 	r.Route("/{id}", func(r chi.Router) {
@@ -39,7 +40,7 @@ func UsersHandler(db *database.Database) chi.Router {
 
 		// Get user by id
 		r.Get("/", rest.Handler(func(r rest.Request) int {
-			if user, err := db.GetUserById(r.ContextValue(idKey).(uint)); err == nil {
+			if user, err := s.User(r.ContextValue(idKey).(uint)); err == nil {
 				return r.RespondJSON(&user)
 			}
 			return http.StatusInternalServerError
@@ -47,12 +48,12 @@ func UsersHandler(db *database.Database) chi.Router {
 
 		// Update user
 		r.Patch("/", rest.Handler(func(r rest.Request) int {
-			var user database.User
+			var user model.User
 			if err := r.ParseJSON(&user); err != nil {
 				return http.StatusBadRequest
 			}
 
-			if err := db.UpdateUser(user, r.ContextValue(idKey).(uint)); err != nil {
+			if err := s.UpdateUser(r.ContextValue(idKey).(uint), user); err != nil {
 				return http.StatusInternalServerError
 			}
 
@@ -61,7 +62,7 @@ func UsersHandler(db *database.Database) chi.Router {
 
 		// Delete user by id
 		r.Delete("/", rest.Handler(func(r rest.Request) int {
-			if err := db.DeleteUserById(r.ContextValue(idKey).(uint)); err != nil {
+			if err := s.DeleteUser(r.ContextValue(idKey).(uint)); err != nil {
 				return http.StatusInternalServerError
 			}
 			return http.StatusOK
