@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// Implements LudoService
 type Database struct {
 	db *gorm.DB
 }
