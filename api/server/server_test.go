@@ -87,7 +87,7 @@ func TestItemEndpoints(t *testing.T) {
 
 	// Create item
 	item := model.Item{Data: "Test Data"}
-	resp := makeRequest(t, s, http.MethodPost, "/items", &item)
+	resp := makeRequest(t, s, http.MethodPost, "/boards/1/items", &item)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("CreateItem failed, code %d", resp.Code)
 	}
@@ -98,12 +98,6 @@ func TestItemEndpoints(t *testing.T) {
 	resp = makeRequest(t, s, http.MethodGet, "/items/"+strconv.Itoa(int(created.ID)), nil)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("GetItemById failed, code %d", resp.Code)
-	}
-
-	// Get all items
-	resp = makeRequest(t, s, http.MethodGet, "/items", nil)
-	if resp.Code != http.StatusOK {
-		t.Fatalf("GetAllItems failed, code %d", resp.Code)
 	}
 
 	// Get item data

@@ -13,29 +13,6 @@ import (
 func ItemsHandler(db *database.Database) chi.Router {
 	r := chi.NewRouter()
 
-	// Get all items
-	r.Get("/", rest.Handler(func(r rest.Request) int {
-		if items, err := db.GetAllItems(); err == nil {
-			return r.RespondJSON(&items)
-		}
-		return http.StatusInternalServerError
-	}))
-
-	// Create item
-	r.Post("/", rest.Handler(func(r rest.Request) int {
-		var item model.Item
-		if err := r.ParseJSON(&item); err != nil {
-			return http.StatusBadRequest
-		}
-
-		id, err := db.CreateItem(item)
-		if err != nil {
-			return http.StatusInternalServerError
-		}
-
-		return r.RespondJSON(&model.ID{ID: id})
-	}))
-
 	r.Route("/{id}", func(r chi.Router) {
 		r.Use(idMiddleware)
 

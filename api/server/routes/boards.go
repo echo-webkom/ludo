@@ -77,6 +77,26 @@ func BoardsHandler(db *database.Database) chi.Router {
 			return http.StatusInternalServerError
 		}))
 
+		// Create item
+		r.Post("/items", rest.Handler(func(r rest.Request) int {
+			var item model.Item
+			if err := r.ParseJSON(&item); err != nil {
+				return http.StatusBadRequest
+			}
+
+			// Check if board exists
+			if _, err := db.GetBoardById(r.ContextValue(idKey).(uint)); err != nil {
+				return http.StatusNotFound
+			}
+
+			id, err := db.CreateItem(item)
+			if err != nil {
+				return http.StatusInternalServerError
+			}
+
+			return r.RespondJSON(&model.ID{ID: id})
+		}))
+
 		// Get all items with status
 		r.Get("/status/{status}/items", rest.Handler(func(r rest.Request) int {
 			status, err := strconv.Atoi(r.R.PathValue("status"))
