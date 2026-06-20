@@ -4,7 +4,7 @@ go 1.24.2
 
 require (
 	github.com/echo-webkom/cenv v1.14.1
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/jesperkha/notifier v1.0.0
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d
